@@ -1,0 +1,863 @@
+<title>CPF 2.0 Re-Verification</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    --paper:      #f4f5f7;
+    --surface:    #ffffff;
+    --ink:        #15181d;
+    --slate:      #5c6672;
+    --hair:       #dde0e5;
+    --hair-soft:  #eaecf0;
+    --accent:     #9a5b00;
+    --accent-bg:  #fdf4e6;
+    --code-bg:    #f2f3f6;
+
+    --sev-crit:   #ad2b21;
+    --sev-crit-bg:#fceeed;
+    --sev-high:   #9a5b00;
+    --sev-high-bg:#fdf3e5;
+    --sev-med:    #3c5d86;
+    --sev-med-bg: #edf2f9;
+    --sev-min:    #5c6672;
+    --sev-min-bg: #eef0f3;
+    --sev-ok:     #2c6a45;
+    --sev-ok-bg:  #eaf4ee;
+
+    --sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --serif:'Newsreader', Georgia, 'Times New Roman', serif;
+    --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:      #101216;
+      --surface:    #171a1f;
+      --ink:        #e6e8eb;
+      --slate:      #9aa4b0;
+      --hair:       #2b3038;
+      --hair-soft:  #23272e;
+      --accent:     #e5a856;
+      --accent-bg:  #2a2117;
+      --code-bg:    #1d2127;
+
+      --sev-crit:   #f08279;  --sev-crit-bg:#2d1a18;
+      --sev-high:   #e5a856;  --sev-high-bg:#2a2117;
+      --sev-med:    #8fb3e0;  --sev-med-bg: #1a222d;
+      --sev-min:    #9aa4b0;  --sev-min-bg: #21252b;
+      --sev-ok:     #79c79b;  --sev-ok-bg:  #172420;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:      #101216;
+    --surface:    #171a1f;
+    --ink:        #e6e8eb;
+    --slate:      #9aa4b0;
+    --hair:       #2b3038;
+    --hair-soft:  #23272e;
+    --accent:     #e5a856;
+    --accent-bg:  #2a2117;
+    --code-bg:    #1d2127;
+
+    --sev-crit:   #f08279;  --sev-crit-bg:#2d1a18;
+    --sev-high:   #e5a856;  --sev-high-bg:#2a2117;
+    --sev-med:    #8fb3e0;  --sev-med-bg: #1a222d;
+    --sev-min:    #9aa4b0;  --sev-min-bg: #21252b;
+    --sev-ok:     #79c79b;  --sev-ok-bg:  #172420;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 56px 24px 96px; }
+
+  /* ---- masthead ---- */
+  .eyebrow {
+    font-family: var(--mono); font-size: 12px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--accent); margin: 0 0 14px;
+  }
+  h1 {
+    font-family: var(--serif); font-weight: 600; font-size: clamp(34px, 5.5vw, 50px);
+    line-height: 1.1; letter-spacing: -.02em; margin: 0 0 14px; text-wrap: balance;
+  }
+  .standfirst {
+    font-family: var(--serif); font-size: 20px; line-height: 1.5;
+    color: var(--slate); margin: 0 0 32px; max-width: 62ch;
+  }
+  .meta {
+    display: flex; flex-wrap: wrap; gap: 8px 28px;
+    font-family: var(--mono); font-size: 12.5px; color: var(--slate);
+    padding: 16px 0; border-top: 1px solid var(--hair); border-bottom: 1px solid var(--hair);
+    margin-bottom: 40px;
+  }
+  .meta b { color: var(--ink); font-weight: 500; }
+
+  /* ---- callout ---- */
+  .callout {
+    background: var(--accent-bg);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 6px 6px 0;
+    padding: 20px 22px;
+    margin: 0 0 40px;
+  }
+  .callout h3 {
+    font-family: var(--sans); font-size: 13px; font-weight: 600;
+    letter-spacing: .06em; text-transform: uppercase; color: var(--accent);
+    margin: 0 0 10px;
+  }
+  .callout p { margin: 0 0 12px; font-size: 15px; }
+  .callout p:last-child { margin-bottom: 0; }
+
+  h2 {
+    font-family: var(--serif); font-size: 28px; font-weight: 600; letter-spacing: -.01em;
+    margin: 56px 0 6px; padding-top: 26px; border-top: 1px solid var(--hair);
+  }
+  h2:first-of-type { margin-top: 44px; }
+  .h2sub { color: var(--slate); font-size: 15px; margin: 0 0 26px; max-width: 62ch; }
+
+  /* ---- summary table ---- */
+  .tablewrap { overflow-x: auto; margin: 0 0 8px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+  th, td { text-align: left; padding: 10px 14px 10px 0; border-bottom: 1px solid var(--hair-soft); vertical-align: top; }
+  th {
+    font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--slate); font-weight: 600; border-bottom: 1px solid var(--hair);
+  }
+  td.id { font-family: var(--mono); white-space: nowrap; font-size: 13px; }
+  td code { font-size: 13px; }
+
+  /* ---- findings ---- */
+  .finding {
+    background: var(--surface);
+    border: 1px solid var(--hair);
+    border-radius: 8px;
+    padding: 22px 24px;
+    margin: 0 0 18px;
+  }
+  .fhead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin-bottom: 10px; }
+  .fid {
+    font-family: var(--mono); font-size: 12px; font-weight: 500;
+    padding: 3px 8px; border-radius: 4px; white-space: nowrap;
+  }
+  .finding h3 {
+    font-family: var(--sans); font-size: 17px; font-weight: 600;
+    margin: 0; line-height: 1.35; flex: 1 1 320px; text-wrap: balance;
+  }
+  .chip {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .05em;
+    padding: 3px 8px; border-radius: 999px; white-space: nowrap;
+    border: 1px solid currentColor;
+  }
+  .crit  { color: var(--sev-crit); background: var(--sev-crit-bg); }
+  .high  { color: var(--sev-high); background: var(--sev-high-bg); }
+  .med   { color: var(--sev-med);  background: var(--sev-med-bg); }
+  .min   { color: var(--sev-min);  background: var(--sev-min-bg); }
+  .ok    { color: var(--sev-ok);   background: var(--sev-ok-bg); }
+
+  .finding p { margin: 0 0 12px; font-size: 15px; }
+  .finding p:last-child { margin-bottom: 0; }
+  .label {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .07em;
+    text-transform: uppercase; color: var(--slate); display: block; margin-bottom: 4px;
+  }
+  pre {
+    font-family: var(--mono); font-size: 13px; line-height: 1.55;
+    background: var(--code-bg); border: 1px solid var(--hair-soft);
+    border-radius: 6px; padding: 12px 14px; overflow-x: auto; margin: 0 0 14px;
+  }
+  code { font-family: var(--mono); font-size: 13.5px; background: var(--code-bg); padding: 1px 5px; border-radius: 3px; }
+  pre code { background: none; padding: 0; font-size: inherit; }
+  blockquote {
+    margin: 0 0 14px; padding: 2px 0 2px 16px;
+    border-left: 2px solid var(--hair);
+    color: var(--ink); font-family: var(--serif); font-size: 16px; line-height: 1.5;
+  }
+  blockquote cite {
+    display: block; margin-top: 6px; font-family: var(--mono); font-style: normal;
+    font-size: 11.5px; color: var(--slate); letter-spacing: .02em;
+  }
+  .verdict {
+    margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--hair);
+    font-size: 14.5px;
+  }
+  .verdict b { font-weight: 600; }
+
+  ul { padding-left: 20px; margin: 0 0 14px; }
+  li { margin-bottom: 7px; font-size: 15px; }
+  .okgrid { display: grid; gap: 10px; }
+  .okrow {
+    display: flex; gap: 12px; align-items: baseline;
+    padding: 11px 14px; background: var(--surface);
+    border: 1px solid var(--hair); border-radius: 6px; font-size: 14.5px;
+  }
+  .okrow code { flex: 0 0 auto; }
+  footer {
+    margin-top: 56px; padding-top: 22px; border-top: 1px solid var(--hair);
+    font-size: 13.5px; color: var(--slate);
+  }
+  a { color: var(--accent); }
+</style>
+
+<div class="wrap">
+
+  <p class="eyebrow">Power Intent Studio · generator audit</p>
+  <h1>CPF 2.0 Re-Verification</h1>
+  <p class="standfirst">
+    <code>sram_power_intent.cpf</code> re-checked against the Si2 Common Power Format
+    specification, with <code>sram_power_intent.upf</code> as the golden reference for
+    what the power intent actually is. Seventeen findings — four of them critical,
+    and one that exists <em>only</em> because the file declares version 2.0.
+  </p>
+
+  <div class="meta">
+    <span><b>Audited</b> sram_power_intent.cpf (111 lines)</span>
+    <span><b>Golden</b> sram_power_intent.upf (139 lines)</span>
+    <span><b>Spec</b> Si2 CPF 2.1, 29-Dec-2014, 320 pp</span>
+    <span><b>Findings</b> 4 critical · 5 high · 4 medium · 3 minor · 10 confirmed correct</span>
+  </div>
+
+  <div class="callout">
+    <h3>Read this first — what was verified against what</h3>
+    <p>
+      <b>Two primary sources, in both directions.</b> Findings are stated against the
+      <b>official Si2 CPF 2.1 specification</b> (29-Dec-2014, 320 pp) — the real PDF, from Si2's
+      own <code>wp-content</code> path via the Internet Archive — and cross-checked against the
+      <b>official Si2 CPF 1.0 specification</b> (02-Jan-2007, the PDF supplied locally as
+      <code>Si2_CommonPowerFormat.pdf</code>, now at <code>docs/reference/</code>). Every
+      version claim below is therefore confirmed twice: present in one spec and absent from the
+      other, rather than inferred.
+    </p>
+    <p>
+      <b>The CPF 2.0 PDF itself was not obtained, and no finding depends on guessing at it.</b>
+      Si2 gates 2.0 and 2.1 behind a download-request form requiring name, email and company;
+      every direct and archived URL for <code>si2_cpf_v2.0_*.pdf</code> returns 404 or redirects
+      to that form, and your details were not submitted. 2.0 availability is instead read from
+      2.1's own two delta records — the front-matter “Enhancements and New Capabilities for CPF
+      2.1” (p. 9) and the per-command change log (pp. 318–320). A construct absent from both of
+      those, but present in 2.1, was already in 2.0. Where a construct <i>is</i> named in them,
+      it is flagged as 2.1-only and treated as unavailable in 2.0.
+    </p>
+    <p>
+      <b>The locally-supplied PDF is Version 1.0, not 2.0.</b> Its title page reads “Si2 Common
+      Power Format Specification™ / Version 1.0 / 02 January 2007” — the same freely-published
+      edition the original audit used, and the one this re-verification was set up to move off.
+      It is not wasted: it is what makes the “CHANGED” and “RESOLVED BY 2.0” classifications
+      below provable rather than asserted, since the question in every such case is precisely
+      <i>what 1.0 said</i>.
+    </p>
+    <p>
+      <b>The original 12 findings could not be recovered.</b> Not in <code>docs/</code>, not among
+      the published artifacts, not in the git history — that audit lives only in a session
+      transcript I do not have. So items are not labelled “1 through 12”. What follows is a
+      complete fresh audit, each item carrying the classification the task asked for. Paste the
+      original twelve and I will map them one-for-one.
+    </p>
+  </div>
+
+  <h2>Summary</h2>
+  <p class="h2sub">
+    Ordered by severity. “2.0 status” answers the question this re-verification exists for:
+    does the finding depend on which version the file claims?
+  </p>
+
+  <div class="tablewrap">
+  <table>
+    <thead>
+      <tr><th>ID</th><th>Finding</th><th>Classification</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="id">C1</td><td><code>connect_supply_net</code> is not a CPF command</td><td><b>Still valid</b> — absent from 1.0, 2.0 <i>and</i> 2.1</td></tr>
+      <tr><td class="id">C2</td><td>No <code>set_design</code> / <code>end_design</code> wrapper</td><td><b>Still valid</b> — unchanged in all three</td></tr>
+      <tr><td class="id">C3</td><td><code>-isolation_power_net</code> / <code>-isolation_ground_net</code> do not exist</td><td><b>Still valid</b> — absent from every CPF version</td></tr>
+      <tr><td class="id">C4</td><td><code>-location self</code> is a <b>2.1</b> addition — invalid in the 2.0 this file declares</td><td><b>New</b> — 2.1-only construct in a 2.0 file</td></tr>
+      <tr><td class="id">H1</td><td><code>PD_TOP</code> selects no instances and is not marked <code>-default</code></td><td><b>Still valid</b>, and stricter in 1.0</td></tr>
+      <tr><td class="id">H2</td><td>Domain exclusion written as a comment; <code>-exclude_instances</code> exists</td><td><b>Resolved by 2.0</b> — flag did not exist in 1.0</td></tr>
+      <tr><td class="id">H3</td><td><code>-acknowledge_receiver</code> is spelled <code>-acknowledge_receiver_1</code></td><td><b>Changed</b> — name <i>and</i> argument type</td></tr>
+      <tr><td class="id">H4</td><td>Switch enable condition is comment-only</td><td><b>Still valid</b> — unchanged in all three</td></tr>
+      <tr><td class="id">H5</td><td><code>VDD_SUB</code> missing the mandatory <code>-internal</code></td><td><b>Still valid</b> — unchanged in all three</td></tr>
+      <tr><td class="id">M1</td><td><code>set_instance .</code> is not a CPF idiom; <code>.</code> is the hierarchy separator</td><td><b>Still valid</b> — unchanged in all three</td></tr>
+      <tr><td class="id">M2</td><td><code>VDD_SUB</code> declared at top scope, not inside <code>u_sub</code></td><td><b>Still valid</b> — unchanged in all three</td></tr>
+      <tr><td class="id">M3</td><td>OFF modelled as 0.0 V; <code>-state off</code> exists</td><td><b>Resolved by 2.0</b> — <code>-state</code> absent from 1.0</td></tr>
+      <tr><td class="id">M4</td><td>Ground rail unexpressed; <code>-ground_voltage</code> exists</td><td><b>Resolved by 2.0</b> — <code>-ground_voltage</code> absent from 1.0</td></tr>
+      <tr><td class="id">L1</td><td>One command per net where <code>-nets</code> takes a list</td><td><b>Still valid</b></td></tr>
+      <tr><td class="id">L2</td><td>Nets carry no <code>-voltage</code></td><td><b>Still valid</b></td></tr>
+      <tr><td class="id">L3</td><td>Header overstates the Supply Set gap</td><td><b>Still valid</b></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <!-- ================= CRITICAL ================= -->
+  <h2>Critical</h2>
+  <p class="h2sub">Each of these makes the file fail to parse, or silently mean something other than the golden UPF.</p>
+
+  <div class="finding">
+    <div class="fhead">
+      <span class="fid crit">C1</span>
+      <h3><code>connect_supply_net</code> is not a CPF command — it is UPF</h3>
+      <span class="chip crit">critical</span>
+    </div>
+    <p>The whole “Macro Connections” section is written in the wrong language:</p>
+    <pre><code>connect_supply_net VDD_INT -ports {u_sram/VDD_INT}
+connect_supply_net VDD -ports {u_sram/VDD}
+connect_supply_net VSS -ports {u_sram/VSS}</code></pre>
+    <p>
+      <span class="label">Spec evidence</span>
+      <code>connect_supply_net</code> occurs <b>zero times</b> in the 320-page CPF 2.1
+      specification, and does not appear in the command index of §9 “General CPF Commands”
+      (pp. 118–120). The CPF construct for this is <code>create_global_connection</code>:
+    </p>
+    <blockquote>
+      create_global_connection -net <i>net</i> { -pins <i>pin_list</i> | -ports <i>port_list</i> | -pg_type <i>pg_type_string</i> } [-domain <i>domain</i> | -instances <i>instance_list</i>]
+      <br>“Specifies how to connect a global net to the specified pins or ports. A global net can be a data net, bias net, power net or ground net.”
+      <cite>Si2 CPF 2.1, create_global_connection, p. 129</cite>
+    </blockquote>
+    <p class="verdict">
+      <b>Fix:</b> <code>create_global_connection -net VDD -pins {u_sram/VDD}</code>. Note
+      <code>-pg_type</code> — that is the CPF 2.0 “support of <code>pg_type</code> in supply net
+      connection” enhancement, and it is the cleaner form for macro PG pins, since it connects
+      by pin <i>type</i> rather than by enumerating names.
+    </p>
+  </div>
+
+  <div class="finding">
+    <div class="fhead">
+      <span class="fid crit">C2</span>
+      <h3>Nothing is inside a power design — no <code>set_design</code> / <code>end_design</code></h3>
+      <span class="chip crit">critical</span>
+    </div>
+    <p>
+      The file opens with <code>set_cpf_version 2.0</code> and goes straight to
+      <code>create_power_nets</code>. There is no design context anywhere in the file.
+    </p>
+    <blockquote>
+      “Begins the definition of a power design, identified by a name that is unique among power
+      designs within the same scope. <b>The power intent represented by the power design is defined
+      by the CPF commands between this command and a matching <code>end_design</code> command.</b>”
+      <cite>Si2 CPF 2.1, set_design, p. 201 — and end_design, p. 184</cite>
+    </blockquote>
+    <p class="verdict">
+      <b>Consequence:</b> every rule in the file is stated outside the scope that would bind it
+      to the <code>sram</code> design. The golden UPF's equivalent framing is
+      <code>set_scope .</code> plus the elaboration root; CPF expresses it structurally instead.
+      <b>Fix:</b> wrap the body in <code>set_design sram</code> … <code>end_design</code>.
+    </p>
+  </div>
+
+  <div class="finding">
+    <div class="fhead">
+      <span class="fid crit">C3</span>
+      <h3><code>-isolation_power_net</code> and <code>-isolation_ground_net</code> do not exist</h3>
+      <span class="chip crit">critical</span>
+    </div>
+    <pre><code>update_isolation_rules -names ISO_RULE \
+    -location self \
+    -isolation_power_net  VDD \
+    -isolation_ground_net VSS</code></pre>
+    <p>
+      <span class="label">Spec evidence</span>
+      Both strings occur <b>zero times</b> in the CPF 2.1 specification. The command's complete
+      documented option set is:
+    </p>
+    <blockquote>
+      update_isolation_rules -names <i>rule_list</i> { -location {from | to | parent | self | automatic | any} | -within_hierarchy <i>instance</i> | -cells <i>cell_list</i> [-use_model -pin_mapping …] | -prefix <i>string</i> | -suffix <i>string</i> | -open_source_pins_only }…
+      <cite>Si2 CPF 2.1, update_isolation_rules, p. 245</cite>
+    </blockquote>
+    <p>
+      The isolation cell's own supply is expressed on the <i>create</i> command instead, via
+      <code>-secondary_domain</code>:
+    </p>
+    <blockquote>
+      create_isolation_rule … [-secondary_domain <i>power_domain</i>]
+      <cite>Si2 CPF 2.1, create_isolation_rule, p. 134</cite>
+    </blockquote>
+    <p class="verdict">
+      <b>Absent from CPF 1.0 as well</b> — both strings occur zero times in the 1.0
+      specification too, so these flags exist in <i>no</i> version of CPF and the original
+      audit cannot have found them legal either.
+      <b>Note for the record:</b> this app's own <code>golden.cpf</code> uses these two flags, and
+      the project's backend CPF parser was extended to accept them. That extension encoded a
+      mistake: they are not CPF. <b>Fix:</b> name the domain whose primary supply powers the
+      isolation cell via <code>-secondary_domain</code>, and drop both flags.
+    </p>
+  </div>
+
+  <div class="finding">
+    <div class="fhead">
+      <span class="fid crit">C4</span>
+      <h3><code>-location self</code> did not exist in CPF 2.0 — and the file declares 2.0</h3>
+      <span class="chip crit">critical</span>
+      <span class="chip crit">version-specific</span>
+    </div>
+    <p>
+      This is the finding the re-verification exists to catch, and it is invisible from the
+      1.0 spec. The file says <code>set_cpf_version 2.0</code> on line 20, then writes
+      <code>update_isolation_rules … -location self</code> on line 75.
+    </p>
+    <blockquote>
+      “Isolation Enhancements —&nbsp;<b>Added support for location self and automatic</b>”
+      <cite>Si2 CPF 2.1, Enhancements and New Capabilities for CPF 2.1, p. 9</cite>
+    </blockquote>
+    <blockquote>
+      “update_isolation_rules — added –location self and –location automatic”
+      <cite>Si2 CPF 2.1, per-command change log, p. 320</cite>
+    </blockquote>
+    <p>
+      <span class="label">Confirmed from the other direction</span>
+      CPF 1.0's isolation <code>-location</code> admits <b>only</b>
+      <code>{from | to}</code> — not even <code>parent</code>:
+    </p>
+    <blockquote>
+      { -location {from | to} …
+      <cite>Si2 CPF 1.0, update_isolation_rules — the supplied Si2_CommonPowerFormat.pdf</cite>
+    </blockquote>
+    <p>
+      So <code>self</code> is invalid in 1.0 <i>and</i> 2.0, and legal only from 2.1.
+    </p>
+    <p class="verdict">
+      <b>Consequence:</b> the file is internally inconsistent — it claims a version that cannot
+      express one of its own constructs. <b>Two valid fixes, and the choice is a product
+      decision:</b> emit <code>set_cpf_version 2.1</code>, or map <code>self</code> onto a
+      2.0-legal location. The same applies to <code>update_level_shifter_rules -location self</code>,
+      which this design does not exercise but the generator can emit.
+      <b>Worth noting separately:</b> CPF 2.1 is a real, shipped version that this app does not
+      currently offer as an export target.
+    </p>
+  </div>
+
+  <!-- ================= HIGH ================= -->
+  <h2>High priority</h2>
+  <p class="h2sub">The file parses, but says materially less than the golden UPF does.</p>
+
+  <div class="finding">
+    <div class="fhead">
+      <span class="fid high">H1</span>
+      <h3><code>PD_TOP</code> contains nothing — no <code>-instances</code>, no <code>-default</code></h3>
+      <span class="chip high">high</span>
+    </div>
+    <pre><code>create_power_domain -name PD_TOP
+update_power_domain -name PD_TOP -primary_power_net VDD -primary_ground_net VSS</code></pre>
+    <p>
+      The golden UPF says <code>create_power_domain PD_TOP -elements {.}</code> — the whole design
+      root. The CPF says nothing at all about membership, so the domain selects no instances.
+    </p>
+    <blockquote>
+      “-default — Identifies the specified domain as the default power domain. <b>All instances of
+      the current design scope that were not associated with a specific power domain belong to
+      the default power domain.</b>”
+      <cite>Si2 CPF 2.1, create_power_domain, p. 160</cite>
+    </blockquote>
+    <p class="verdict">
+      <b>Fix:</b> <code>create_power_domain -name PD_TOP -default</code>. This is also what makes
+      H2 unnecessary — see below.
+      <br><br><b>CPF 1.0 was stricter still</b>, which is worth knowing because it means this was
+      never legal: 1.0 writes the three selectors as a <i>mandatory</i> choice group —
+      <code>{ -default [-instances …] | -instances … | -boundary_ports … }</code> — so a domain
+      with none of them is a syntax error there, not merely an empty domain.
+    </p>
+  </div>
+
+  <div class="finding">
+    <div class="fhead">
+      <span class="fid high">H2</span>
+      <h3>The exclusion is a comment, and <code>-exclude_instances</code> exists</h3>
+      <span class="chip high">high</span>
+      <span class="chip high">resolved by 2.0</span>
+    </div>
+    <pre><code>#   PD_TOP excludes nested sub-hierarchy domain(s): u_sub</code></pre>
+    <p>
+      The generator emits this comment because it “isn't confident enough in an exact CPF
+      equivalent to assert one”. <b>Against CPF 1.0 that was correct</b> —
+      <code>exclude_instances</code> occurs zero times in the 1.0 specification, whose
+      <code>create_power_domain</code> offers no exclusion option at all. The flag was added
+      after 1.0, so this is a genuine <i>resolved by 2.0</i> item rather than an old miss:</p>
+    <blockquote>
+      create_power_domain -name <i>power_domain</i> [-instances <i>instance_list</i>] <b>[-exclude_instances <i>instance_list</i>]</b> …
+      <br>“Excludes those instances already selected through the -instances option. <b>If the
+      specified instance is not selected through the -instances option, it will be ignored.</b>”
+      <cite>Si2 CPF 2.1, create_power_domain, pp. 158 and 161</cite>
+    </blockquote>
+    <p class="verdict">
+      <b>But read the caveat before using it.</b> With PD_TOP fixed per H1 to
+      <code>-default</code>, <code>-exclude_instances</code> would be <i>ignored</i> — nothing was
+      selected by <code>-instances</code> to exclude from. And it is not needed: CPF's default-domain
+      semantics already exclude <code>u_sub</code>, because <code>u_sub</code> is explicitly
+      associated with <code>PD_SUB</code>. <b>Correct outcome: fix H1 and delete the comment</b>,
+      rather than converting the comment into a flag that does nothing.
+    </p>
+  </div>
+
+  <div class="finding">
+    <div class="fhead">
+      <span class="fid high">H3</span>
+      <h3><code>-acknowledge_receiver</code> is not the option name</h3>
+      <span class="chip high">high</span>
+      <span class="chip high">changed vs 1.0-era research</span>
+    </div>
+    <pre><code>update_power_switch_rule -name PG_SWITCH -acknowledge_receiver pwr_switch_ack</code></pre>
+    <blockquote>
+      update_power_switch_rule -name <i>string</i> { -enable_condition_1 <i>expression</i> | -enable_condition_2 <i>expression</i> | <b>-acknowledge_receiver_1 <i>expression</i></b> | <b>-acknowledge_receiver_2 <i>expression</i></b> | -cells <i>cell_list</i> | -gate_bias_net <i>power_net</i> | -prefix <i>string</i> | … }…
+      <br>“Note: If a switch rule has -acknowledge_receiver_2 specified, it must also have
+      -acknowledge_receiver_1.”
+      <cite>Si2 CPF 2.1, update_power_switch_rule, p. 266</cite>
+    </blockquote>
+    <p>
+      The options are <b>numbered</b>, and paired with the correspondingly numbered
+      <code>-enable_condition_<i>x</i></code>. The unnumbered spelling does not appear in any
+      2.x syntax block.
+    </p>
+    <p>
+      <span class="label">Confirmed from the other direction</span>
+      CPF 1.0 has exactly the spelling this app emits — <b>and a different argument type</b>:
+    </p>
+    <blockquote>
+      | -acknowledge_receiver <i>pin</i>
+      <cite>Si2 CPF 1.0, update_power_switch_rule — the supplied Si2_CommonPowerFormat.pdf</cite>
+    </blockquote>
+    <p>
+      So two things changed, not one: <code>-acknowledge_receiver <i>pin</i></code> became
+      <code>-acknowledge_receiver_1 <i>expression</i></code>. The app's output is provably
+      1.0-shaped.
+    </p>
+    <p class="verdict">
+      <b>One honest complication.</b> The spec contradicts itself here. Prose under
+      <code>define_power_switch_cell</code> (p. 300) refers to “the <code>-acknowledge_receiver</code>
+      option of the <b><code>create_power_switch_rule</code></b> command” — but
+      <code>create_power_switch_rule</code>'s own syntax block (p. 173) lists only
+      <code>-name</code>, <code>-domain</code> and <code>-external_power_net</code>/
+      <code>-external_ground_net</code>. Resolve in favour of the syntax blocks, as this project
+      already did once for a similar CPF inconsistency: emit
+      <code>-acknowledge_receiver_1</code> on <code>update_power_switch_rule</code>.
+    </p>
+  </div>
+
+  <div class="finding">
+    <div class="fhead">
+      <span class="fid high">H4</span>
+      <h3>The switch's control expression never reaches a construct</h3>
+      <span class="chip high">high</span>
+    </div>
+    <p>The golden UPF states the switch's control and both states:</p>
+    <pre><code>-control_port {CTRL pwr_switch_en} \
+-on_state {on VIN {CTRL}} \
+-off_state {off {!CTRL}}</code></pre>
+    <p>The CPF puts all of it in a comment:</p>
+    <pre><code>#   PG_SWITCH: … control_port='CTRL' ack_port='ACK'
+#   on_state='pwr_switch_en' off_state='!pwr_switch_en'</code></pre>
+    <p>CPF has two real homes for this, and the spec's own worked example uses both:</p>
+    <blockquote>
+      create_power_domain -name X <b>-shutoff_condition !ena</b> -instances …<br>
+      update_power_domain -name X -primary_power_net VDD_SW<br>
+      create_power_switch_rule -name ps1 -domain X -external_power_net VDD
+      <cite>Si2 CPF 2.1, create_power_switch_rule, example, p. 174</cite>
+    </blockquote>
+    <blockquote>
+      “By default, <b>the inversion of the expression specified for the shutoff condition of the
+      power domain is used as the driver for the enable pin</b> of the power switch cell. For
+      complicated cells with multiple enable pins, or if you want to use a different signal to
+      drive the enable pins, use the <code>update_power_switch_rule</code> command.”
+      <cite>Si2 CPF 2.1, create_power_switch_rule, p. 173</cite>
+    </blockquote>
+    <p class="verdict">
+      <b>Fix:</b> <code>create_power_domain -name PD_SUB -shutoff_condition {!pwr_switch_en}</code>,
+      and/or <code>update_power_switch_rule -name PG_SWITCH -enable_condition_1 {pwr_switch_en}</code>.
+      Without either, a CPF consumer has no idea when this domain powers down — which is the
+      single most load-bearing fact the golden UPF carries about it.
+    </p>
+  </div>
+
+  <div class="finding">
+    <div class="fhead">
+      <span class="fid high">H5</span>
+      <h3><code>VDD_SUB</code> is missing <code>-internal</code>, which the spec makes mandatory</h3>
+      <span class="chip high">high</span>
+    </div>
+    <pre><code>create_power_nets -nets {VDD_SUB}</code></pre>
+    <blockquote>
+      “-internal — Specifies that the nets must be driven by an on-chip power switch.
+      <b>You must specify this option if this power net is the primary power net of an internal
+      switchable power domain using header switches.</b>”
+      <cite>Si2 CPF 2.1, create_power_nets, p. 171 (and create_ground_nets, p. 132)</cite>
+    </blockquote>
+    <p class="verdict">
+      <b>That is exactly <code>VDD_SUB</code>:</b> it is <code>PD_SUB</code>'s primary power net
+      (line 48) and it is driven by the on-chip switch <code>PG_SWITCH</code> (line 58). The
+      generator even labels the section “Internal Supplies (power)” — it knows the fact and does
+      not emit it. <b>Fix:</b> <code>create_power_nets -nets {VDD_SUB} -internal</code>.
+    </p>
+  </div>
+
+  <!-- ================= MEDIUM ================= -->
+  <h2>Medium</h2>
+
+  <div class="finding">
+    <div class="fhead">
+      <span class="fid med">M1</span>
+      <h3><code>set_instance .</code> is a UPF idiom; in CPF <code>.</code> is the hierarchy separator</h3>
+      <span class="chip med">medium</span>
+    </div>
+    <pre><code>set_instance u_sub
+…
+set_instance .</code></pre>
+    <p>
+      Scoping <i>into</i> <code>u_sub</code> is correct — “If the command is specified with an
+      instance name only, it will change the design scope” (p. 214). Coming back out is not.
+      <code>set_instance .</code> occurs <b>zero times</b> in the spec, and:
+    </p>
+    <blockquote>
+      “The supported hierarchy separators are — <b>period (.) default</b>; slash (/) recommended;
+      colon (:).”
+      <cite>Si2 CPF 2.1, Hierarchy separators, p. 44</cite>
+    </blockquote>
+    <p class="verdict">
+      So <code>.</code> is not a “root” token in CPF — it is the default separator character, and
+      <code>set_instance .</code> reads as an instance literally named <code>.</code>. CPF restores
+      scope structurally instead: “The scope will be restored to the scope prior to the
+      <code>set_instance</code> command after the <code>end_design</code>” (p. 73). This finding is
+      therefore entangled with C2 — fixing the design wrapper gives scope restoration for free.
+    </p>
+  </div>
+
+  <div class="finding">
+    <div class="fhead">
+      <span class="fid med">M2</span>
+      <h3><code>VDD_SUB</code> is declared at the top scope, not inside <code>u_sub</code></h3>
+      <span class="chip med">medium</span>
+    </div>
+    <p>
+      The golden UPF declares it inside <code>set_scope u_sub</code> (line 36). The CPF declares
+      it on line 30, before any <code>set_instance</code>.
+    </p>
+    <blockquote>
+      “<b>The power nets are created within the current scope.</b>”
+      <cite>Si2 CPF 2.1, create_power_nets, p. 171</cite>
+    </blockquote>
+    <p class="verdict">
+      The two files therefore place the same net in different scopes. The app already solved this
+      for its UPF writer — nets are grouped by scope and wrapped — and the CPF writer emits every
+      net flat at the root.
+    </p>
+  </div>
+
+  <div class="finding">
+    <div class="fhead">
+      <span class="fid med">M3</span>
+      <h3>OFF is modelled as 0.0 V, but <code>-state off</code> exists in CPF 2.0</h3>
+      <span class="chip med">medium</span>
+      <span class="chip med">reverses a 1.0-era conclusion</span>
+    </div>
+    <pre><code>create_nominal_condition -name COND_3 -voltage 0.0</code></pre>
+    <p>
+      This project explicitly concluded, from the CPF 1.0 spec, that “OFF is a 0.0V condition,
+      <b>NOT</b> a <code>-state off</code> flag (CPF 1.0 defines no such option)”. That reading
+      of 1.0 was exactly right, and 1.0 says so in as many words:
+    </p>
+    <blockquote>
+      create_nominal_condition -name <i>string</i> -voltage <i>float</i> [-pmos_bias_voltage <i>float</i>] [-nmos_bias_voltage <i>float</i>]
+      <br>“Note: <b>A power domain is switched off if it is associated with a nominal condition
+      whose voltage is 0.</b>”
+      <cite>Si2 CPF 1.0, create_nominal_condition — the supplied Si2_CommonPowerFormat.pdf</cite>
+    </blockquote>
+    <p>
+      There is no <code>-state</code> option there, and no <code>-ground_voltage</code> either
+      (see M4). It is not true of the version this file targets:
+    </p>
+    <blockquote>
+      create_nominal_condition -name <i>string</i> -voltage {<i>voltage</i> | <i>voltage_list</i>} [-ground_voltage …] <b>[-state {on | off | standby}]</b> …
+      <br>“-state {on | off | standby} — Specifies the state of a power domain when it uses this
+      nominal condition.”
+      <cite>Si2 CPF 2.1, create_nominal_condition, pp. 146 and 150</cite>
+    </blockquote>
+    <p class="verdict">
+      <code>-state</code> appears in neither 2.1 delta list, so it was present in 2.0.
+      <b>Fix:</b> <code>create_nominal_condition -name COND_3 -voltage 0.0 -state off</code>.
+      Stating the state explicitly matters — it is what tells a verification tool the domain is
+      genuinely powered down rather than merely at a low voltage.
+    </p>
+  </div>
+
+  <div class="finding">
+    <div class="fhead">
+      <span class="fid med">M4</span>
+      <h3>The ground rail is never given a voltage</h3>
+      <span class="chip med">medium</span>
+      <span class="chip med">resolved by 2.0</span>
+    </div>
+    <p>
+      The golden UPF states <code>add_port_state VSS -state {ON 0.0}</code>. In the CPF, VSS
+      appears only as a net name and as each domain's <code>-primary_ground_net</code>. The
+      nominal conditions describe the power rail alone — which is why
+      <code>COND_3 -voltage 0.0</code> (power off) is indistinguishable from a
+      condition describing ground.
+    </p>
+    <blockquote>
+      create_nominal_condition … <b>[-ground_voltage {<i>voltage</i> | <i>voltage_list</i>}]</b>
+      <cite>Si2 CPF 2.1, create_nominal_condition, p. 146</cite>
+    </blockquote>
+    <p class="verdict">
+      <b>Fix:</b> add <code>-ground_voltage 0.0</code> to each condition. This also narrows the
+      gap the generated header apologises for (see L3). <b>Another resolved-by-2.0 item:</b>
+      <code>-ground_voltage</code> occurs zero times in CPF 1.0 — a 1.0-based audit could not
+      have raised this at all.
+    </p>
+  </div>
+
+  <!-- ================= MINOR ================= -->
+  <h2>Minor</h2>
+
+  <div class="finding">
+    <div class="fhead">
+      <span class="fid min">L1</span>
+      <h3>One command per net, where <code>-nets</code> takes a list</h3>
+      <span class="chip min">minor</span>
+    </div>
+    <p>
+      <code>-nets <i>net_list</i></code> (p. 171) is list-valued. Four separate
+      <code>create_power_nets</code> commands under four separate section banners is legal and
+      semantically identical — only more verbose. Worth grouping only if the section headings
+      are not themselves load-bearing for the reader.
+    </p>
+  </div>
+
+  <div class="finding">
+    <div class="fhead">
+      <span class="fid min">L2</span>
+      <h3>Nets carry no <code>-voltage</code></h3>
+      <span class="chip min">minor</span>
+    </div>
+    <p>
+      <code>create_power_nets … [-voltage {float | voltage_range}]</code> (p. 171) would let the
+      rail voltages be stated at declaration as well as in the nominal conditions. Optional, and
+      the conditions already carry the operative values — listed for completeness.
+    </p>
+  </div>
+
+  <div class="finding">
+    <div class="fhead">
+      <span class="fid min">L3</span>
+      <h3>The header overstates the Supply Set gap</h3>
+      <span class="chip min">minor</span>
+    </div>
+    <pre><code># Supply Sets have no direct CPF equivalent -- folded into each
+# domain's own primary_power_net/primary_ground_net below instead.</code></pre>
+    <p>
+      True as far as it goes — CPF has no supply-set construct. But the specific thing this design
+      uses a supply set for (naming the isolation cell's own supply) <i>does</i> have a home:
+      <code>create_isolation_rule -secondary_domain</code>, per C3. The note as written suggests
+      more is lost than actually is.
+    </p>
+  </div>
+
+  <!-- ================= CORRECT ================= -->
+  <h2>Confirmed correct</h2>
+  <p class="h2sub">
+    Verified against the 2.1 syntax blocks and recorded here so they are not re-investigated.
+  </p>
+
+  <div class="okgrid">
+    <div class="okrow"><code>set_cpf_version 2.0</code><span>First command in the file, as required: “If specified, this command must be the first CPF command in a CPF file.” (p. 108)</span></div>
+    <div class="okrow"><code>create_power_nets -nets</code><span>Correct command and option for declaring power nets (p. 171).</span></div>
+    <div class="okrow"><code>create_ground_nets -nets</code><span>Correct for ground nets (p. 132).</span></div>
+    <div class="okrow"><code>create_power_domain -name -instances</code><span>Both real options, correct spelling (p. 158). <code>PD_SUB</code> is well-formed.</span></div>
+    <div class="okrow"><code>update_power_domain -primary_power_net -primary_ground_net</code><span>Matches the spec's own worked example verbatim (p. 174).</span></div>
+    <div class="okrow"><code>create_power_switch_rule -name -domain -external_power_net</code><span>Exactly the documented signature, and exactly the example on p. 174.</span></div>
+    <div class="okrow"><code>update_power_switch_rule -cells</code><span>Real option; the documented way to pin a specific switch cell (p. 266).</span></div>
+    <div class="okrow"><code>create_isolation_rule -name -from -isolation_condition -pins</code><span>All four real; <code>-isolation_output low</code> is a legal value of {high|low|hold|tristate|clamp_high|clamp_low} (p. 134).</span></div>
+    <div class="okrow"><code>create_power_mode -name -domain_conditions -default</code><span>Correct, and exactly one mode carries <code>-default</code>: “you must define one (and only one) power mode as the default mode” (p. 168).</span></div>
+    <div class="okrow"><code>set_instance u_sub</code><span>Scoping <i>in</i> is correct — an instance name alone changes the design scope (p. 214). Only the return trip is wrong (M1).</span></div>
+  </div>
+
+  <h2>What changed because of the version</h2>
+  <p class="h2sub">
+    The answer to the question this task was set to ask — and, with both specs in hand,
+    provable in each direction rather than inferred.
+  </p>
+
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Construct</th><th>CPF 1.0</th><th>CPF 2.0 / 2.1</th><th>Bears on</th></tr></thead>
+    <tbody>
+      <tr><td><code>-exclude_instances</code></td><td>absent</td><td>present</td><td class="id">H2</td></tr>
+      <tr><td><code>-secondary_domain</code></td><td>absent</td><td>present</td><td class="id">C3 (the fix)</td></tr>
+      <tr><td><code>-state {on|off|standby}</code></td><td>absent</td><td>present</td><td class="id">M3</td></tr>
+      <tr><td><code>-ground_voltage</code></td><td>absent</td><td>present</td><td class="id">M4</td></tr>
+      <tr><td><code>-pg_type</code> (global connection)</td><td>absent</td><td>present</td><td class="id">new in 2.x</td></tr>
+      <tr><td><code>-acknowledge_receiver <i>pin</i></code></td><td>present</td><td><b>renamed</b> to <code>_1</code>, now an expression</td><td class="id">H3</td></tr>
+      <tr><td>isolation <code>-location</code></td><td><code>{from|to}</code></td><td><code>{…|parent|self|automatic|any}</code> — <code>self</code> is 2.1-only</td><td class="id">C4</td></tr>
+      <tr><td><code>connect_supply_net</code></td><td>absent</td><td>absent</td><td class="id">C1</td></tr>
+      <tr><td><code>-isolation_power_net</code> / <code>_ground_net</code></td><td>absent</td><td>absent</td><td class="id">C3</td></tr>
+      <tr><td><code>set_design</code> / <code>end_design</code></td><td>present</td><td>present</td><td class="id">C2</td></tr>
+      <tr><td><code>-shutoff_condition</code>, <code>-enable_condition_1</code></td><td>present</td><td>present</td><td class="id">H4</td></tr>
+      <tr><td><code>-internal</code></td><td>present</td><td>present</td><td class="id">H5</td></tr>
+      <tr><td><code>-default</code> (domain)</td><td>present, <b>mandatory choice group</b></td><td>present, optional</td><td class="id">H1</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>In classification terms:</p>
+  <ul>
+    <li><b>Resolved by 2.0 — three items.</b> H2, M3 and M4 each flag something a 1.0-based audit
+      was <i>right</i> to call unavailable. The constructs arrived after 1.0, so these are gaps in
+      the generator rather than errors in the original audit.</li>
+    <li><b>Changed — two items.</b> H3's option changed name <i>and</i> argument type. C4 is the
+      sharper one: <code>-location self</code> is legal only from 2.1, so the file's own
+      <code>set_cpf_version 2.0</code> contradicts its own content — a defect no reading of 1.0
+      could have surfaced, since 1.0 has neither <code>self</code> nor <code>parent</code>.</li>
+    <li><b>Still valid — eleven items.</b> C1, C2, C3, H1, H4, H5, M1, M2 and all three minors
+      hold identically across 1.0, 2.0 and 2.1. C3 is worth singling out: those two flags exist
+      in no version of CPF at all, so the app's backend parser was extended to accept something
+      that was never syntax.</li>
+  </ul>
+
+  <h2>New in 2.x that this generator does not use</h2>
+  <p class="h2sub">The fresh pass the task asked for, beyond re-verifying the existing list.</p>
+  <ul>
+    <li><b><code>create_global_connection -pg_type</code></b> — connect macro PG pins by
+      <i>type</i> rather than by enumerating <code>u_sram/VDD</code>, <code>u_sram/VSS</code>,
+      <code>u_sram/VDD_INT</code> individually. Cited in the CPF 2.0 release notes as
+      “support of <code>pg_type</code> in supply net connection”.</li>
+    <li><b><code>create_power_domain -base_domains</code></b> — the CPF expression of a derived
+      domain, closer to UPF's <code>-available_supplies {SS_VDD}</code> on <code>PD_SUB</code>
+      (golden UPF line 69) than anything the generator currently emits. Worth evaluating; not
+      asserted here as a like-for-like equivalent.</li>
+    <li><b><code>create_power_domain -driver_boundary_ports</code> / <code>-receiver_boundary_ports</code></b>
+      — added in 2.1 (p. 319). These are the direct counterpart of the app's own Port Attribute
+      driver/receiver split, which currently collapses into a single <code>-boundary_ports</code>
+      list. <b>2.1 only.</b></li>
+    <li><b><code>assert_illegal_domain_configurations</code></b> — CPF has a first-class construct
+      for stating that a domain-condition combination is illegal (p. 120). Nothing in the app
+      produces it today.</li>
+    <li><b>CPF 2.1 as an export target.</b> The app offers CPF 2.0 only. 2.1 is a real shipped
+      version (29-Dec-2014) and is what makes C4's <code>-location self</code> legal.</li>
+  </ul>
+
+  <footer>
+    <p>
+      <b>Methodology.</b> Findings are stated against the Si2 CPF 2.1 specification (29 December
+      2014, 320 pp, ISBN 978-1-882750-78-8), obtained as the official Si2 PDF via the Internet
+      Archive, and cross-checked against the Si2 CPF 1.0 specification (2 January 2007, ISBN
+      1-882750-20-9), the locally-supplied <code>Si2_CommonPowerFormat.pdf</code>. Version
+      attribution for 2.0 uses 2.1's own two delta records — the front-matter “Enhancements and
+      New Capabilities for CPF 2.1” (p. 9) and the per-command change log (pp. 318–320): a
+      construct absent from both, but present in 2.1, was already in 2.0. 2.1 page numbers are
+      from the printed page footers. No CPF syntax in this report is quoted from memory or from
+      a secondary source.
+    </p>
+    <p>
+      <b>Not verified.</b> The CPF 2.0 PDF itself. Si2 distributes 2.0 and 2.1 only through a
+      download-request form requiring personal details, which was not submitted; the
+      locally-supplied PDF turned out to be Version 1.0. Every finding that turns on 2.0-versus-2.1
+      availability says so in its own text rather than assuming.
+    </p>
+    <p><b>Report only — no code changed.</b></p>
+  </footer>
+
+</div>

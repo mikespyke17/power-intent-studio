@@ -1,0 +1,65 @@
+## ---------------------------------------------------------------------------
+## sram -- CPF 2.0
+## Written in CPF idiom: a set_design block, ground nets declared
+## separately from power nets, rules named with -from/-to rather than a
+## domain, and system modes built out of nominal conditions.
+## ---------------------------------------------------------------------------
+
+set_cpf_version 2.0
+
+set_design sram
+
+## nets ----------------------------------------------------------------------
+create_power_nets  -nets VDD_MAIN -voltage 1.0
+create_power_nets  -nets VDD_RET  -voltage 1.0
+create_ground_nets -nets VSS_MAIN
+
+## domains -------------------------------------------------------------------
+## The default domain owns everything not explicitly carved out.
+create_power_domain -name PD_DEFAULT -default \
+    -boundary_ports { clk cen_b wen_b sleep_b iso_en a d q power_good }
+update_power_domain -name PD_DEFAULT \
+    -primary_power_net  VDD_MAIN \
+    -primary_ground_net VSS_MAIN
+
+create_power_domain -name PD_LOGIC \
+    -instances { u_sub } \
+    -shutoff_condition { !sleep_b }
+update_power_domain -name PD_LOGIC \
+    -primary_power_net  VDD_RET \
+    -primary_ground_net VSS_MAIN
+
+## switch --------------------------------------------------------------------
+create_power_switch_rule -name PSR_LOGIC \
+    -domain PD_LOGIC \
+    -external_power_net VDD_MAIN
+update_power_switch_rule -name PSR_LOGIC -cells { SWCELL_A }
+
+## isolation -- named by -from, the CPF way (no -domain flag exists) ----------
+create_isolation_rule -name IR_LOGIC_OUT \
+    -from PD_LOGIC \
+    -isolation_condition { iso_en } \
+    -isolation_output low \
+    -pins { q }
+update_isolation_rules -names IR_LOGIC_OUT \
+    -location to \
+    -isolation_power_net  VDD_MAIN \
+    -isolation_ground_net VSS_MAIN
+
+## level shifter -------------------------------------------------------------
+create_level_shifter_rule -name LSR_LOGIC -from PD_LOGIC
+update_level_shifter_rules -names LSR_LOGIC -location to -cells { LS_A }
+
+## retention -----------------------------------------------------------------
+create_state_retention_rule -name SRR_LOGIC \
+    -domain PD_LOGIC \
+    -restore_edge { !sleep_b }
+
+## system modes --------------------------------------------------------------
+create_nominal_condition -name high -voltage 1.0
+create_nominal_condition -name off  -voltage 0.0 -state off
+
+create_power_mode -name PM_RUN   -domain_conditions { PD_DEFAULT@high PD_LOGIC@high } -default
+create_power_mode -name PM_SLEEP -domain_conditions { PD_DEFAULT@high PD_LOGIC@off }
+
+end_design

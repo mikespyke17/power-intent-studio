@@ -1,0 +1,31 @@
+# Deliberately WRONG against this design, to pin the ERROR classification.
+# Everything here is syntactically valid UPF; the references are what is
+# broken. Nothing in this file should crash the load.
+set_upf_version 3.1
+
+create_supply_port VDD_X ; create_supply_net VDD_X
+create_supply_port VSS_X ; create_supply_net VSS_X
+connect_supply_net VDD_X -ports {VDD_X}
+connect_supply_net VSS_X -ports {VSS_X}
+create_supply_set SS_X -function {power VDD_X} -function {ground VSS_X}
+
+# u_cache does not exist in this design (only u_sram and u_sub do)
+create_power_domain PD_GHOST -elements {u_cache} -supply {primary SS_X}
+
+# a domain whose elements PARTLY resolve
+create_power_domain PD_PARTIAL -elements {u_sub u_nowhere} -supply {primary SS_X}
+
+# a net declared in a scope that is not a block of this design
+create_supply_net VDD_DEEP -domain PD_PARTIAL
+
+# a strategy naming a supply set that was never created
+set_isolation ISO_BAD -domain PD_PARTIAL -isolation_supply_set SS_MISSING \
+    -clamp_value 0 -elements {q}
+
+# a switch whose output supply is not a declared net
+create_power_switch SW_BAD -domain PD_PARTIAL \
+    -output_supply_port {vo VDD_NOT_DECLARED} \
+    -control_port {en sleep_b}
+
+# a strategy whose domain was never created at all
+set_retention RET_BAD -domain PD_NOT_THERE -retention_supply_set SS_X

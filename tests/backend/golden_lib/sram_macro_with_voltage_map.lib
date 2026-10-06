@@ -1,0 +1,25 @@
+library (my_sram_lib) {
+    technology (cmos);
+    delay_model : table_lookup;
+    voltage_map (VDD, 0.8);
+    voltage_map (VSS, 0.0);
+
+    cell (SRAM_256x8) {
+        area : 1200.0;
+        pg_pin (VDD) {
+            voltage_name : VDD;
+            pg_type : primary_power;
+        }
+        pg_pin (VSS) {
+            voltage_name : VSS;
+            pg_type : primary_ground;
+        }
+        pg_pin (VDDI) {
+            voltage_name : VDDI;
+            pg_type : internal_power;
+        }
+        pin (clk) {
+            direction : input;
+        }
+    }
+}

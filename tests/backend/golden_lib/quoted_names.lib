@@ -1,0 +1,46 @@
+library ("quoted_names_lib") {
+    delay_model : table_lookup;
+
+    type (bus8) {
+        base_type : array;
+        data_type : bit;
+        bit_width : 8;
+        bit_from : 7;
+        bit_to : 0;
+        downto : true;
+    }
+
+    cell ("QUOTED_SRAM_256x8") {
+        area : 1200.0;
+
+        pg_pin ("VDD") {
+            voltage_name : "VDD";
+            pg_type : primary_power;
+        }
+        pg_pin ("VSS") {
+            voltage_name : "VSS";
+            pg_type : primary_ground;
+        }
+
+        pin ("clk") {
+            direction : input;
+            capacitance : 0.01;
+            related_power_pin : "VDD";
+            related_ground_pin : "VSS";
+        }
+
+        bus ("a") {
+            bus_type : bus8;
+            direction : input;
+        }
+
+        /* A quoted name containing brackets -- quoting is REQUIRED
+           here, since an unquoted "q[0]" would parse as bus/bit-range
+           syntax rather than a plain identifier. */
+        pin ("q[0]") {
+            direction : output;
+            related_power_pin : "VDD";
+            related_ground_pin : "VSS";
+        }
+    }
+}

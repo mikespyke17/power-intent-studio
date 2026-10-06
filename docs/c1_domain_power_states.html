@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Domain Power States</title>
+<meta name="description" content="Research and proposal for audit item C1 -- domain-level power states that compose other domains' named states.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* Minimal reset -- supplied by the artifact runtime when this report is
+     published, so a standalone copy has to carry it. */
+  *, *::before, *::after { box-sizing: border-box; }
+  img, svg { max-width: 100%; height: auto; }
+</style>
+<style>
+  :root {
+    --paper:    #f4f5f7;
+    --card:     #ffffff;
+    --ink:      #1b1f24;
+    --ink-soft: #5b6873;
+    --rule:     #d9dee4;
+    --accent:   #0b6e99;
+    --ok:       #157f5c;
+    --warn:     #9c5c06;
+    --stop:     #a3302a;
+    --ok-bg:    #e6f2ed;
+    --warn-bg:  #f9eedd;
+    --stop-bg:  #f8e7e5;
+    --code-bg:  #eceff3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #131619; --card: #191d22; --ink: #e4e8ec; --ink-soft: #94a3af;
+      --rule: #2b3138; --accent: #5fb3d9; --ok: #5fc9a2; --warn: #e0a457;
+      --stop: #ef8a80; --ok-bg: #16281f; --warn-bg: #2c2214; --stop-bg: #2e1a18;
+      --code-bg: #1f242a;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #131619; --card: #191d22; --ink: #e4e8ec; --ink-soft: #94a3af;
+    --rule: #2b3138; --accent: #5fb3d9; --ok: #5fc9a2; --warn: #e0a457;
+    --stop: #ef8a80; --ok-bg: #16281f; --warn-bg: #2c2214; --stop-bg: #2e1a18;
+    --code-bg: #1f242a;
+  }
+
+  body {
+    background: var(--paper); color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    font-size: 16px; line-height: 1.6; margin: 0;
+    padding: 0 1.25rem 6rem; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 62rem; margin: 0 auto; }
+  .col  { max-width: 43rem; }
+
+  header { padding: 4rem 0 2rem; border-bottom: 2px solid var(--ink); }
+  .eyebrow { font-family: "IBM Plex Mono", monospace; font-size: .74rem;
+             letter-spacing: .14em; text-transform: uppercase;
+             color: var(--accent); margin: 0 0 .9rem; }
+  h1 { font-family: "IBM Plex Sans Condensed", sans-serif; font-weight: 700;
+       font-size: clamp(2.1rem, 5vw, 3.1rem); line-height: 1.04;
+       letter-spacing: -.015em; margin: 0 0 1rem; text-wrap: balance; }
+  .standfirst { font-size: 1.08rem; color: var(--ink-soft); margin: 0; max-width: 41rem; }
+  .filepath { font-family: "IBM Plex Mono", monospace; font-size: .8rem;
+              color: var(--ink-soft); margin: 1.4rem 0 0; }
+
+  h2 { font-family: "IBM Plex Sans Condensed", sans-serif; font-weight: 700;
+       font-size: 1.65rem; letter-spacing: -.01em; margin: 3.5rem 0 .4rem;
+       padding-top: 1.4rem; border-top: 1px solid var(--rule); text-wrap: balance; }
+  h3 { font-size: 1.05rem; font-weight: 600; margin: 2.2rem 0 .5rem; }
+  h3 .ln { font-family: "IBM Plex Mono", monospace; font-weight: 400;
+           font-size: .78rem; color: var(--ink-soft); margin-left: .5rem; }
+  p { margin: .75rem 0; }
+  .lede { color: var(--ink-soft); margin-top: .2rem; }
+
+  code, pre { font-family: "IBM Plex Mono", monospace; }
+  code { background: var(--code-bg); padding: .1em .34em; border-radius: 3px; font-size: .875em; }
+  pre { background: var(--code-bg); border-left: 3px solid var(--accent);
+        padding: .9rem 1.1rem; overflow-x: auto; font-size: .8rem;
+        line-height: 1.55; margin: .9rem 0; }
+  pre code { background: none; padding: 0; font-size: inherit; }
+  pre.quoted { border-left-color: var(--ok); }
+
+  .tag { display: inline-block; font-family: "IBM Plex Mono", monospace;
+         font-size: .68rem; font-weight: 500; letter-spacing: .07em;
+         text-transform: uppercase; padding: .17em .5em; border-radius: 3px;
+         vertical-align: .12em; white-space: nowrap; }
+  .t-gap  { background: var(--stop-bg); color: var(--stop); border: 1px solid var(--stop); }
+  .t-pre  { background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn); }
+  .t-ok   { background: var(--ok-bg);   color: var(--ok);   border: 1px solid var(--ok); }
+
+  .note { border-left: 3px solid var(--accent); background: var(--card);
+          padding: .9rem 1.1rem; margin: 1.4rem 0; font-size: .95rem; }
+  .note.warn { border-left-color: var(--warn); }
+  .note.stop { border-left-color: var(--stop); }
+  .note p:first-child { margin-top: 0; } .note p:last-child { margin-bottom: 0; }
+
+  .scroll { overflow-x: auto; margin: 1.2rem 0 1.6rem; border: 1px solid var(--rule);
+            background: var(--card); }
+  table { border-collapse: collapse; width: 100%; font-size: .87rem; }
+  th, td { text-align: left; padding: .6rem .8rem; border-bottom: 1px solid var(--rule);
+           vertical-align: top; }
+  th { font-family: "IBM Plex Mono", monospace; font-size: .7rem; letter-spacing: .08em;
+       text-transform: uppercase; color: var(--ink-soft); background: var(--code-bg);
+       white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+  td.mono { font-family: "IBM Plex Mono", monospace; font-size: .8rem; white-space: nowrap; }
+
+  .option { border: 1px solid var(--rule); background: var(--card); margin: 1.6rem 0;
+            padding: 1.2rem 1.35rem; }
+  .option h3 { margin-top: 0; }
+  .option dl { margin: 1rem 0 0; display: grid; grid-template-columns: max-content 1fr;
+               gap: .45rem 1.1rem; font-size: .92rem; }
+  .option dt { font-family: "IBM Plex Mono", monospace; font-size: .7rem;
+               letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft);
+               padding-top: .25rem; }
+  .option dd { margin: 0; }
+  @media (max-width: 40rem) {
+    .option dl { grid-template-columns: 1fr; gap: .15rem; }
+    .option dt { padding-top: .6rem; }
+  }
+  .risk { font-family: "IBM Plex Mono", monospace; font-size: .72rem;
+          letter-spacing: .06em; text-transform: uppercase; }
+  .risk-low  { color: var(--ok); }
+  .risk-med  { color: var(--warn); }
+  .risk-high { color: var(--stop); }
+
+  ul, ol { padding-left: 1.3rem; } li { margin: .4rem 0; }
+  .fine { font-size: .88rem; color: var(--ink-soft); }
+  a { color: var(--accent); }
+  footer { margin-top: 4rem; padding-top: 1.4rem; border-top: 1px solid var(--rule);
+           font-size: .85rem; color: var(--ink-soft); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">Audit item C1 &middot; Research and proposal &middot; No code changed</p>
+  <h1>Domain Power States</h1>
+  <p class="standfirst">A power domain whose named states are written in terms of <em>other domains'</em> named
+  states. What the reference file actually says, why the current two-tier model cannot hold it, and three ways
+  forward &mdash; with the honest cost of each.</p>
+  <p class="filepath">examples/aura_top/upf/aura_top.upf &middot; section 6, L183&ndash;243 &middot; 6 commands, 22 states</p>
+</header>
+
+<div class="col">
+<div class="note stop">
+<p><strong>One thing found while measuring, before any of the design discussion.</strong> Eighteen of the 22 domain
+states carry BOTH a <code>-supply_expr</code> and a <code>-logic_expr</code>. The IR has a single
+<code>PowerState.expr</code> field, and <code>_nested_state_expr()</code> is documented as returning
+&ldquo;the <em>first</em> <code>-supply_expr</code>/<code>-logic_expr</code> value found&rdquo; &mdash; so
+<strong>one of the two is silently discarded</strong>.</p>
+<p>Measured on <code>PS_TURBO</code>: the IR keeps <code>SS_TOP == HV</code> and loses
+<code>PD_CPU == RUN_HV &amp;&amp; PD_DSP == RUN_BOOST &amp;&amp; &hellip;</code> entirely &mdash; which is the whole
+of what C1 is about. This is a backend defect below the GUI, it applies to all three options below, and it is worth
+fixing on its own terms regardless of which one is chosen. The phase-1&ndash;3 audit missed it because that audit
+measured what got <em>rejected</em>, not what got silently <em>dropped</em>.</p>
+</div>
+</div>
+
+<h2>1. What the reference actually says</h2>
+<p class="lede col">Quoted from the file, not from the earlier audit. Section 6 contains two structurally different
+things, both written with the same command.</p>
+
+<h3>Layer A &mdash; leaf domain states <span class="ln">L187&ndash;211 &middot; 5 commands, 15 states</span></h3>
+<pre class="quoted"><code>add_power_state PD_CPU -domain \
+  -state RUN_HV  {-supply_expr {SS_CPU == ON_HV} -logic_expr {iso_en_w[2] == 0}} \
+  -state RUN_LV  {-supply_expr {SS_CPU == ON_LV} -logic_expr {iso_en_w[2] == 0}} \
+  -state RETAIN  {-supply_expr {SS_CPU == OFF &amp;&amp; SS_RET == ON} \
+                  -logic_expr  {iso_en_w[2] == 1}} \
+  -state DOWN    {-supply_expr {SS_CPU == OFF} -logic_expr {iso_en_w[2] == 1}}</code></pre>
+<p><strong>What it expresses.</strong> &ldquo;<code>PD_CPU</code> is in state <code>RUN_HV</code> exactly when its
+supply set <code>SS_CPU</code> is in <em>its own</em> state <code>ON_HV</code>, <em>and</em> the RTL signal
+<code>iso_en_w[2]</code> is 0.&rdquo; The two clauses are different kinds of condition, which is why UPF gives them
+separate flags: <code>-supply_expr</code> is a condition over <strong>supply-set states</strong> (Tier-1 names),
+<code>-logic_expr</code> a condition over <strong>RTL logic</strong>.</p>
+<p><code>RETAIN</code> is the interesting one: its <code>-supply_expr</code> conjoins <strong>two</strong> supply
+sets, and the second (<code>SS_RET</code>) is not <code>PD_CPU</code>'s primary &mdash; it is its
+<code>default_retention</code> handle, associated at L109. So a domain state can be a condition over any supply set
+the domain is associated with, not just its primary.</p>
+
+<h3>Layer B &mdash; the composite system state <span class="ln">L215&ndash;243 &middot; 1 command, 7 states</span></h3>
+<pre class="quoted"><code># System states.  These are the seven rows the RTL sequencer walks
+# through; aura_pmu_pkg::power_state_e uses the same names.
+add_power_state PD_TOP -domain \
+  -state PS_TURBO      {-supply_expr {SS_TOP == HV} \
+                        -logic_expr  {PD_CPU == RUN_HV &amp;&amp; PD_DSP == RUN_BOOST &amp;&amp; \
+                                      PD_MEM == ACTIVE &amp;&amp; PD_PERIPH == RUN_HV &amp;&amp; \
+                                      PD_AON == ACTIVE}} \
+  -state PS_SLEEP_RET  {-supply_expr {SS_TOP == LV} \
+                        -logic_expr  {PD_CPU == RETAIN &amp;&amp; PD_DSP == DOWN &amp;&amp; \
+                                      PD_MEM == RETAIN &amp;&amp; PD_PERIPH == DOWN &amp;&amp; \
+                                      PD_AON == ACTIVE}}</code></pre>
+<p><strong>What it expresses.</strong> &ldquo;The chip is in <code>PS_TURBO</code> exactly when <code>PD_TOP</code>'s
+own supply set is at <code>HV</code>, <em>and</em> each of the five subordinate domains is in the named state
+listed.&rdquo; Here <code>-logic_expr</code> references <strong>other power domains by name, compared against their
+own state names</strong> &mdash; no RTL signal appears in it at all.</p>
+<p>The file's own comment (L213&ndash;214) names the stakes: these seven are the system modes the RTL sequencer walks,
+and <code>aura_pmu_pkg::power_state_e</code> uses the same identifiers. The <em>names</em> are load-bearing, not
+incidental labels.</p>
+
+<h3>Verified, not assumed</h3>
+<p>This composition pattern is standard, documented, intended UPF &mdash; not an idiom local to this file. Marschner's
+DVCon paper <em>Unleashing the Full Power of UPF Power States</em> carries a section under the heading
+&ldquo;Power states of power domain PDTOP based on the power states of domains PDA, PDB&rdquo;:</p>
+<pre><code>add_power_state PDTOP -domain \
+  -state {S1 -logic_expr { PDA == RUN &amp;&amp; PDB == RUN } } \
+  -state {S2 -logic_expr { PDA == SLEEP || PDB == SLEEP } } \
+  -state {S3 -logic_expr { PDA != RUN &amp;&amp; PDB != SHUTDOWN } }</code></pre>
+<p>Two further things that paper establishes, both relevant to scoping:</p>
+<ul>
+<li><strong>The real operator set is <code>&amp;&amp; || == !=</code></strong>, including disjunction and negation.
+<code>aura_top</code> itself uses only <code>&amp;&amp;</code> and <code>==</code> &mdash; so the reference is a
+<em>subset</em> of what the construct allows, and any model built to it should be explicit about which it targets.</li>
+<li><strong>A domain may also reference its own supply handle by FUNCTION and its own states</strong>
+(<code>-logic_expr {primary == ON}</code>, <code>{PD != UP &amp;&amp; PD != DOWN}</code>). <code>aura_top</code>
+instead names the supply SET (<code>SS_CPU == ON_HV</code>). Both spellings occur.</li>
+</ul>
+
+<div class="note">
+<p><strong>The reference uses <code>create_power_state_group</code> zero times.</strong> Grepped and confirmed. It
+expresses its system modes purely as <code>add_power_state PD_TOP -domain</code>. That matters for the options
+below: the app's current Tier 2 emits a group, which is a <em>different construct</em> from what this file uses, not
+a different spelling of it.</p>
+</div>
+
+<h2>2. Where the two-tier model falls short</h2>
+<p class="lede col">The current Tier 2 emits, per Power State Table row:</p>
+<pre><code>add_power_state -group &lt;TOP&gt;_PST \
+    -state { &lt;ROW NAME&gt; \
+        -logic_expr { \
+                SS_A == STATE_1 &amp;&amp; \
+                SS_B == STATE_2 \
+        } \
+    }</code></pre>
+<p class="col">&mdash; a conjunction of <strong>supply-set</strong> state equalities, where each
+<code>STATE_N</code> is a name the generator invents by deduplicating rail combinations. Four separable gaps
+separate that from the reference. They are worth keeping apart, because they have different costs.</p>
+
+<div class="scroll"><table>
+<tr><th>#</th><th>Gap</th><th>Evidence</th></tr>
+<tr>
+  <td class="mono">G1</td>
+  <td><strong>Wrong object.</strong> Tier 2 attaches every system state to one global <code>create_power_state_group</code>; the reference attaches them to a POWER DOMAIN. Different construct, different owning object.</td>
+  <td>Measured: both domain-state commands import as <strong>zero</strong> table rows plus one UNRECOGNIZED warning each &mdash; <code>"'domain' is not modelled by this tool&hellip; a power state is attached to a supply here, never to a domain directly"</code>.</td>
+</tr>
+<tr>
+  <td class="mono">G2</td>
+  <td><strong>No referent to name.</strong> Tier 2's terms can only be <code>&lt;supply set&gt; == STATE_N</code>. There is no per-domain named state anywhere in the app to put on the left of a term.</td>
+  <td><code>PowerStateTableRow</code> is <code>(power_domain_id, state_name, net_states)</code>, and <code>power_domain_id</code> is used <em>only</em> to scope row-name uniqueness &mdash; never as a state-bearing object.</td>
+</tr>
+<tr>
+  <td class="mono">G3</td>
+  <td><strong>A tier is missing.</strong> The reference has THREE levels: supply-set states &rarr; per-domain states &rarr; system states. The app has two. The absent level is exactly the one <code>PD_TOP</code>'s expression is written in terms of.</td>
+  <td>5 commands / 15 states at the per-domain level; 1 command / 7 states composing them.</td>
+</tr>
+<tr>
+  <td class="mono">G4</td>
+  <td><strong>One expression where UPF has two.</strong> 18 of 22 states carry both <code>-supply_expr</code> and <code>-logic_expr</code>; the IR silently keeps the first.</td>
+  <td><code>PowerState.expr: Optional[str]</code>, single field. <code>_nested_state_expr()</code>: <em>&ldquo;Returns the first -supply_expr/-logic_expr value found&rdquo;</em>, guarded by <code>if &hellip; and expr is None</code>.</td>
+</tr>
+</table></div>
+
+<h3>What is <em>not</em> the problem</h3>
+<p class="col"><strong>Expression richness is not the blocker.</strong> <code>aura_top</code> uses only
+<code>&amp;&amp;</code> and <code>==</code> &mdash; both of which Tier 2 already generates. This is an
+<em>object-model</em> gap, not a language gap: the app cannot name a domain state, not that it cannot combine terms.
+Saying it the other way round would point the work in the wrong direction.</p>
+
+<h2>3. Three options</h2>
+<p class="lede col">G4 is a prerequisite for all three and is not counted against any of them.</p>
+
+<div class="option">
+<h3>Option A &mdash; a third tier: per-domain named states <span class="tag t-gap">restructuring</span></h3>
+<p>Introduce a per-domain state entity &mdash; <code>(power_domain_id, name, supply-set conditions, logic
+condition)</code> &mdash; and make the existing Power State Table the <strong>system</strong> tier, whose rows
+reference those names instead of per-net values.</p>
+<dl>
+  <dt>Table UI</dt>
+  <dd>Structural change. Columns become one per <strong>Power Domain</strong> rather than one per Supply Net, each
+  cell a dropdown of that domain's own state names &mdash; plus a new editor for the per-domain states themselves.
+  Comparable in spirit to the supply-set-scoped-rows redesign that was considered and rejected earlier, though the
+  cell contents stay simple dropdowns.</dd>
+  <dt>UPF</dt>
+  <dd>Direct and natural: <code>add_power_state &lt;PD&gt; -domain</code> per domain, then one for the top domain
+  composing them. Raises a real question the reference answers by omission &mdash; does
+  <code>create_power_state_group</code> stay, go, or become an option?</dd>
+  <dt>CPF</dt>
+  <dd><strong>Improves it.</strong> <code>create_power_mode -domain_conditions {PD_CPU@RUN_HV PD_DSP@DOWN}</code> is
+  <em>literally</em> per-domain named states. The app currently has to derive that from a primary supply set's power
+  rail &mdash; a compromise the earlier work recorded. Option A supplies the real data.</dd>
+  <dt>Ripples</dt>
+  <dd>Power State Table tab (columns, cascade, validation), Properties tables, the importer's
+  <code>build_power_state_table()</code>, essentially every existing power-state test, the <code>.pis</code> format
+  (a 10th state family), <code>supported_features</code>.</dd>
+  <dt>Risk</dt>
+  <dd><span class="risk risk-high">high</span> &mdash; but it is the shape the reference has, it preserves the
+  authored names, and it makes CPF output more correct rather than less.</dd>
+</dl>
+</div>
+
+<div class="option">
+<h3>Option B &mdash; extend Tier 2's expression language <span class="tag t-pre">collapses into A</span></h3>
+<p>Keep the group, but allow terms of the form <code>&lt;PD&gt; == &lt;state&gt;</code> alongside
+<code>&lt;SS&gt; == STATE_N</code>.</p>
+<p><strong>As stated, this does not work</strong>, and it is worth saying so plainly rather than proposing it as the
+cheap path. The reason Tier 2 cannot express <code>PS_TURBO</code> is not its operator set &mdash; it is that no
+per-domain named state exists to reference (G2). Extending the language without introducing the referent produces a
+language that can name nothing. Option B therefore requires Option A's new entity, at which point it <em>is</em>
+Option A with the group retained.</p>
+<p><strong>One coherent variant.</strong> <em>Derive</em> per-domain state names automatically from the existing
+table: group each row's nets by which domain's supply sets use them, deduplicate, and synthesise
+<code>PD_CPU == STATE_2</code> exactly as Tier 1 already synthesises supply-set <code>STATE_N</code>.</p>
+<dl>
+  <dt>Table UI</dt>
+  <dd><strong>No change at all.</strong> This is its whole appeal.</dd>
+  <dt>UPF / CPF</dt>
+  <dd>Generation-only. Produces the right <em>shape</em> for both, including CPF's
+  <code>-domain_conditions</code>.</dd>
+  <dt>Cost</dt>
+  <dd>The names are generated, not authored: <code>PD_CPU == STATE_2</code>, never
+  <code>PD_CPU == RETAIN</code>. For a file whose own comment says the RTL enum uses these identifiers, that is a
+  real loss of intent. It also cannot express Layer A's <code>-logic_expr</code> over RTL signals
+  (<code>iso_en_w[2] == 0</code>) &mdash; there is nowhere to author one.</dd>
+  <dt>Risk</dt>
+  <dd><span class="risk risk-med">low&ndash;medium</span> &mdash; contained, but delivers the structure without the
+  names, and the names are much of the value here.</dd>
+</dl>
+</div>
+
+<div class="option">
+<h3>Option C &mdash; carry the expressions verbatim, do not interpret them <span class="tag t-ok">lossless, not modelled</span></h3>
+<p>Store both authored expressions as text &mdash; two optional fields on a small new &ldquo;Domain States&rdquo;
+table, or columns on the existing one &mdash; and re-emit them unchanged. The app never parses them.</p>
+<dl>
+  <dt>Table UI</dt>
+  <dd>Minimal: two text columns, or a small side table.</dd>
+  <dt>UPF / CPF</dt>
+  <dd>Emit verbatim. Fixes the round trip completely and is the <strong>only</strong> option that handles Layer A's
+  RTL-signal conditions honestly.</dd>
+  <dt>Cost</dt>
+  <dd>The app does not <em>understand</em> these states: no validation, no diagram colour, no cross-checking that a
+  referenced state exists. It becomes a faithful text editor for this one construct.</dd>
+  <dt>Risk</dt>
+  <dd><span class="risk risk-low">low</span></dd>
+</dl>
+</div>
+
+<h2>The decision this actually turns on</h2>
+<div class="col">
+<p>Not &ldquo;which option is best&rdquo; but <strong>what C1 support is for</strong>:</p>
+<ul>
+<li>If the goal is to <strong>author and reason about system modes</strong> the way the reference does &mdash;
+named per-domain states, composed, validated, reflected in the Properties tables &mdash; then
+<strong>Option A</strong> is the honest answer, and its cost should be accepted rather than engineered around.</li>
+<li>If the goal is <strong>not losing a real file's intent</strong> on load and re-export, <strong>Option C</strong>
+achieves that today for a fraction of the work, and leaves A available later.</li>
+<li><strong>Option B's derived-names variant</strong> is the middle path, and its price is precise: the generated
+file is structurally right and its state names are this app's inventions rather than the designer's.</li>
+</ul>
+<p>Worth noting that A and C are not exclusive. C could ship first as the lossless floor, with A layered on when the
+per-domain model is wanted &mdash; the verbatim fields then become the fallback for any expression the structured
+model cannot represent, which is how the app already treats several constructs it stores but does not interpret.</p>
+</div>
+
+<h2>Flagged uncertain</h2>
+<ol class="col">
+<li><strong>Whether <code>create_power_state_group</code> and <code>add_power_state &lt;PD&gt; -domain</code> are
+alternatives or complements.</strong> The reference uses only the latter; the app emits only the former. Both are
+real. Which one a consuming tool expects &mdash; or whether a file should carry both, as this one carries both modern
+and legacy state tables &mdash; is not something I could establish from the sources checked.</li>
+<li><strong>Whether a per-domain state's supply condition may reference any associated supply set or only
+specific handles.</strong> <code>PD_CPU</code>'s <code>RETAIN</code> conjoins <code>SS_CPU</code> and
+<code>SS_RET</code>, the latter being its <code>default_retention</code>. Whether that generalises to
+&ldquo;any associated set&rdquo; affects how constrained Option A's editor can be.</li>
+<li><strong>Which operator subset to target.</strong> <code>aura_top</code> needs only
+<code>&amp;&amp;</code>/<code>==</code>; the standard allows <code>||</code>/<code>!=</code>. A structured model that
+supports only the former will reject files the standard permits &mdash; a scope decision, not a technical one.</li>
+</ol>
+
+<footer>
+Research and proposal only. No code changed, no dialogs added, no generation logic touched. G4 &mdash; the silently
+discarded second expression &mdash; is a separable backend fix worth doing whichever option is chosen.
+</footer>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,64 @@
+# Exercises every construct the app's own generator emits, in the exact
+# spelling it emits -- the dialect the elaborator could not read before
+# round-trip import motivated closing the gap. Mirrors
+# examples/upf_example_1_sram/upf/golden.upf's own syntax.
+upf_version 3.1
+set_scope .
+
+create_supply_port VDD
+create_supply_port VSS
+create_supply_net VDD
+create_supply_net VSS
+create_supply_net VDD_SUB
+connect_supply_net VDD -ports {VDD}
+connect_supply_net VSS -ports {VSS}
+
+create_supply_set SS_VDD     -function {power VDD}     -function {ground VSS}
+create_supply_set SS_VDD_SUB -function {power VDD_SUB} -function {ground VSS}
+
+set_port_attributes -ports {clk cen_b} -driver_supply SS_VDD
+set_port_attributes -ports {q} -receiver_supply SS_VDD
+
+create_power_domain PD_TOP \
+    -elements {.} \
+    -exclude_elements {u_sub} \
+    -supply {primary SS_VDD} \
+    -supply {secondary SS_VDD_SUB}
+
+create_power_domain PD_SUB \
+    -elements {u_sub} \
+    -supply {primary SS_VDD_SUB} \
+    -available_supplies {SS_VDD}
+
+create_power_switch PSW_SUB \
+    -domain PD_SUB \
+    -input_supply_port {in VDD} \
+    -output_supply_port {out VDD_SUB} \
+    -control_port {ctrl pwr_en} \
+    -on_state {on in {ctrl}} \
+    -off_state {off {!ctrl}}
+map_power_switch {PSW_SUB} -lib_cells {HDR_CELL}
+
+set_isolation ISO_SUB -domain PD_SUB \
+  -isolation_supply_set SS_VDD \
+  -clamp_value 0 \
+  -isolation_signal iso_en \
+  -isolation_sense high \
+  -elements {o_q} \
+  -location parent
+
+set_retention RET_SUB -domain PD_SUB \
+  -supply {primary SS_VDD_SUB} \
+  -supply {retention SS_VDD} \
+  -elements {u_sub/q_reg}
+set_retention_control RET_SUB -domain PD_SUB -save_signal {save_n} -restore_signal {restore_n}
+
+set_level_shifter LS_SUB -domain PD_SUB \
+  -applies_to outputs \
+  -location parent \
+  -rule low_to_high \
+  -threshold 0.4
+set_level_shifter_cell -level_shifter LS_SUB -cell_name LS_CELL
+
+add_power_state VDD     -state {ON 1.2} -state {OFF off}
+add_power_state VDD_SUB -state {ON 1.2} -state {SWITCH_OFF 0.0} -state {OFF off}

@@ -1,0 +1,43 @@
+library (my_sram_lib) {
+    type (bus8) {
+        base_type : array;
+        data_type : bit;
+        bit_width : 8;
+        bit_from : 7;
+        bit_to : 0;
+        downto : true;
+    }
+
+    cell (SRAM_256x8) {
+        pin (clk) {
+            direction : input;
+        }
+        pin (we) {
+            direction : input;
+        }
+        bus (addr) {
+            bus_type : bus8;
+            direction : input;
+            pin (addr[7]) { }
+            pin (addr[6]) { }
+            pin (addr[5]) { }
+            pin (addr[4]) { }
+            pin (addr[3]) { }
+            pin (addr[2]) { }
+            pin (addr[1]) { }
+            pin (addr[0]) { }
+        }
+        bus (data) {
+            bus_type : bus8;
+            direction : inout;
+            pin (data[7]) { }
+            pin (data[6]) { }
+            pin (data[5]) { }
+            pin (data[4]) { }
+            pin (data[3]) { }
+            pin (data[2]) { }
+            pin (data[1]) { }
+            pin (data[0]) { }
+        }
+    }
+}

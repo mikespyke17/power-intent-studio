@@ -1,0 +1,7 @@
+set_cpf_version 2.0
+
+set_design top
+create_power_domain -name PD1 -default -instances {.}
+create_isolation_rule -name ir1 -from PD1 -isolation_condition {en}
+update_isolation_rules -names {ir1} -location from
+end_design

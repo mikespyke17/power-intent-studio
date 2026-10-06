@@ -1,0 +1,4 @@
+upf_version 3.0
+
+create_power_domain PD_TOP -elements {.}
+set_level_shifter LS_CORE -domain PD_TOP -source PD_TOP -sink PD_TOP -location fanout

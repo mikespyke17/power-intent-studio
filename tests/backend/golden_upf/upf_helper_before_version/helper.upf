@@ -1,0 +1,2 @@
+set some_shared_var 42
+proc helper_proc {} { return 1 }

@@ -1,0 +1,21 @@
+upf_version 3.1
+
+create_power_domain PD_TOP -elements {.} -exclude_elements {u_dbg}
+
+create_supply_port VDD_IN -direction in
+create_supply_net VDD -domain PD_TOP
+create_supply_net VDD_CORE
+connect_supply_net VDD_CORE -domain PD_TOP
+create_supply_set SS_CORE -function {power VDD} -function {ground VSS}
+set_domain_supply_net PD_TOP -primary_power_net VDD -primary_ground_net VSS
+
+create_power_switch SW_CORE -domain PD_TOP -input_supply_port VDD -output_supply_port VDD_CORE -control_port sleep_n
+
+set_isolation ISO_CORE -domain PD_TOP -source PD_TOP -sink PD_TOP -elements {u_core/out1 u_core/out2} -location fanout -clamp_value 0 -isolation_supply SS_CORE
+set_retention RET_CORE -domain PD_TOP -elements {u_core} -retention_supply SS_CORE -save_signal save_n -restore_signal restore_n
+set_level_shifter LS_CORE -domain PD_TOP -source PD_TOP -sink PD_TOP -elements {u_core/out3} -location self
+
+add_power_state SS_CORE -state ON -logic_expr {sleep_n == 1} -domain PD_TOP -supply SS_CORE -complete
+add_power_state SS_CORE -state OFF -logic_expr {sleep_n == 0}
+
+create_power_state_group PSG_TOP -elements {SS_CORE}

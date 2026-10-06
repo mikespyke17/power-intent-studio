@@ -1,0 +1,150 @@
+# Idiomatic UPF 3.1, exercising the constructs a HAND-WRITTEN file
+# actually uses -- as opposed to the canonical shape this app's own
+# generator produces, which is what the round-trip suite covers.
+#
+# Every construct here had to be implemented for it: the file failed at
+# its FIRST unsupported command before that, so none of the rest was
+# even reached. Notably associate_supply_set -handle, add_power_state
+# by flag with a nested -state, set_isolation -applies_to,
+# set_level_shifter -input_supply/-output_supply, create_power_switch
+# -supply_set, and a boundary net reached through connect_supply_net
+# under a DIFFERENT name.
+#
+# Vendored here from examples/soc_with_ram, which was curated away --
+# the coverage is worth keeping even though the example is not. Names
+# are remapped onto this fixture's own sram/u_sub hierarchy.
+
+upf_version 3.1
+
+# Load this file at the design scope containing u_sub.
+#
+# Assumed existing RTL control signals:
+#   sub_sleep_n       : 1 = switch ON, 0 = switch OFF
+#   sub_iso_n         : 0 = isolation asserted
+#   retention_save_n     : active-low save control
+#   retention_restore_n  : active-low restore control
+#
+# Example nominal voltage: 1.0 V. Replace with the actual design voltage.
+
+# --- Power domains ---------------------------------------------------------
+
+create_power_domain PD_TOP \
+    -elements {.} \
+    -exclude_elements {u_sub}
+
+create_power_domain PD_SUB \
+    -elements {u_sub}
+
+# --- Supply ports and nets -------------------------------------------------
+
+create_supply_port VDD_IN -direction in
+create_supply_port VSS_IN -direction in
+
+create_supply_net VDD_ALWAYS_ON
+create_supply_net VDD_SUB_SW
+create_supply_net VSS
+
+connect_supply_net VDD_ALWAYS_ON -ports {VDD_IN}
+connect_supply_net VSS           -ports {VSS_IN}
+
+# --- Supply sets and primary-supply associations ----------------------------
+
+create_supply_set SS_TOP \
+    -function {power VDD_ALWAYS_ON} \
+    -function {ground VSS}
+
+create_supply_set SS_SUB \
+    -function {power VDD_SUB_SW} \
+    -function {ground VSS}
+
+associate_supply_set SS_TOP    -handle PD_TOP.primary
+associate_supply_set SS_SUB -handle PD_SUB.primary
+
+# --- Power switch ----------------------------------------------------------
+# VIN, VOUT, and EN are switch-local port names.
+# State expressions reference the switch-local control port EN.
+
+create_power_switch SW_SUB \
+    -domain PD_SUB \
+    -supply_set SS_TOP \
+    -input_supply_port  {VIN  VDD_ALWAYS_ON} \
+    -output_supply_port {VOUT VDD_SUB_SW} \
+    -control_port       {EN   sub_sleep_n} \
+    -on_state  {ON  VIN {EN}} \
+    -off_state {OFF {!EN}}
+
+# --- Isolation -------------------------------------------------------------
+# Include addr_out as well as data_out and valid_out.
+# Assumption: all three require a zero clamp when the peripheral is isolated.
+
+set_isolation ISO_PERIPH \
+    -domain PD_SUB \
+    -source SS_SUB \
+    -sink SS_TOP \
+    -elements {u_sub/data_out u_sub/valid_out u_sub/addr_out} \
+    -applies_to outputs \
+    -location parent \
+    -clamp_value 0 \
+    -isolation_supply SS_TOP \
+    -isolation_signal sub_iso_n \
+    -isolation_sense low
+
+# --- Level shifting --------------------------------------------------------
+# Retained from the original as a voltage-dependent strategy.
+# With the same 1.0 V nominal supply on both sides, no voltage conversion
+# is required. Do not force insertion for this same-voltage topology.
+
+set_level_shifter LS_PERIPH \
+    -domain PD_SUB \
+    -source SS_SUB \
+    -sink SS_TOP \
+    -elements {u_sub/addr_out} \
+    -applies_to outputs \
+    -rule both \
+    -input_supply SS_SUB \
+    -output_supply SS_TOP \
+    -location self
+
+# --- Retention -------------------------------------------------------------
+
+set_retention RET_PERIPH \
+    -domain PD_SUB \
+    -elements {u_sub} \
+    -retention_supply SS_TOP \
+    -save_signal    {retention_save_n low} \
+    -restore_signal {retention_restore_n low}
+
+# --- Supply-set power states -----------------------------------------------
+# These describe supply conditions; they do not drive the external supplies.
+
+add_power_state -supply SS_TOP \
+    -state {ON \
+        -supply_expr {power == {FULL_ON 1.0} && ground == {FULL_ON 0.0}} \
+        -simstate NORMAL \
+    } \
+    -complete
+
+# Define both peripheral states before marking the definition complete.
+
+add_power_state -supply SS_SUB \
+    -state {ON \
+        -supply_expr {power == {FULL_ON 1.0} && ground == {FULL_ON 0.0}} \
+        -simstate NORMAL \
+    } \
+    -state {OFF \
+        -supply_expr {power == OFF && ground == {FULL_ON 0.0}} \
+        -simstate CORRUPT \
+    } \
+    -complete
+
+# --- Domain power states ---------------------------------------------------
+# Domain states reference supply-set states rather than supply expressions.
+
+add_power_state -domain PD_TOP \
+    -state {ON -logic_expr {SS_TOP == ON}} \
+    -complete
+
+add_power_state -domain PD_SUB \
+    -state {ON  -logic_expr {SS_SUB == ON}} \
+    -state {OFF -logic_expr {SS_SUB == OFF}} \
+    -complete

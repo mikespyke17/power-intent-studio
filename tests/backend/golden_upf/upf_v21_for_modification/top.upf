@@ -1,0 +1,4 @@
+upf_version 2.1
+
+create_power_domain PD1 -elements {.}
+set_isolation ISO1 -domain PD1 -location parent

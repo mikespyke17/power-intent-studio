@@ -1,0 +1,11 @@
+# Blank issues are disabled so every report arrives with the context the
+# templates ask for -- for a tool whose output people are asked to trust,
+# "which version, which design, what did it generate" is usually the
+# difference between a reproducible report and a conversation.
+#
+# OPTIONAL: delete this file to allow blank issues again.
+blank_issues_enabled: false
+contact_links:
+  - name: Question or discussion
+    url: https://github.com/mikespyke17/power-intent-studio/discussions
+    about: For usage questions and open-ended discussion, rather than a bug or a request.

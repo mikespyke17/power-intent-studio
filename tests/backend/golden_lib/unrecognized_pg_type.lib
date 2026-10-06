@@ -1,0 +1,15 @@
+library (bad_pg_type_lib) {
+    technology (cmos);
+    delay_model : table_lookup;
+
+    cell (BAD_PG_CELL) {
+        area : 100.0;
+        pg_pin (VNW) {
+            voltage_name : VNW;
+            pg_type : deepnwell;
+        }
+        pin (clk) {
+            direction : input;
+        }
+    }
+}

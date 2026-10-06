@@ -1,0 +1,6 @@
+set_cpf_version 2.0
+
+set_design top
+create_power_domain -name PD_TOP -default -instances {.}
+update_power_domain -name PD_TOP -internal_power_net VDD -internal_ground_net VSS
+end_design

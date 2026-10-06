@@ -1,0 +1,24 @@
+# Retention with NO -elements, which in UPF means "every retainable
+# element in the domain". Added once this design gained a real flop
+# (u_sub/o_q) -- until then simple10 had no sequential element anywhere,
+# so finding 16's fix could not be demonstrated on it at all and had to
+# be verified against examples/soc_with_ram instead.
+set_upf_version 3.1
+
+create_supply_port VDD_C ; create_supply_port VSS_C
+create_supply_net  VDD_C ; create_supply_net  VSS_C
+create_supply_net  VDD_RET
+connect_supply_net VDD_C -ports {VDD_C}
+connect_supply_net VSS_C -ports {VSS_C}
+
+create_supply_set SS_RUN -function {power VDD_C}   -function {ground VSS_C}
+create_supply_set SS_KEEP -function {power VDD_RET} -function {ground VSS_C}
+
+create_power_domain PD_FLOP -elements {u_sub} -supply {primary SS_RUN}
+
+# The flag is omitted deliberately: the domain's own retainable elements
+# are what this retains, and the tool must work that out.
+set_retention RET_EVERYTHING -domain PD_FLOP \
+    -retention_supply_set SS_KEEP \
+    -save_signal {clk posedge} \
+    -restore_signal {clk negedge}

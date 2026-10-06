@@ -1,0 +1,27 @@
+# Bias-aware flow: the supply sets carry well rails as well as power and
+# ground, and the isolation rule is built up over two commands rather
+# than declared in one.
+set_upf_version 3.1
+
+create_supply_port VDDA ; create_supply_port VSSA
+create_supply_net  VDDA ; create_supply_net  VSSA
+create_supply_net  VNW  ; create_supply_net  VPW
+connect_supply_net VDDA -ports {VDDA}
+connect_supply_net VSSA -ports {VSSA}
+
+# four function handles, not two
+create_supply_set SS_BIAS \
+    -function {power  VDDA} \
+    -function {ground VSSA} \
+    -function {nwell  VNW}  \
+    -function {pwell  VPW}
+
+create_power_domain PD_ANALOG -elements {.} -supply {primary SS_BIAS}
+
+# declared first, refined after -- successive refinement, the UPF
+# methodology this elaborator's own accumulate-then-freeze design exists for
+set_isolation ISO_A -domain PD_ANALOG -clamp_value 1 -elements {power_good}
+set_isolation ISO_A -domain PD_ANALOG -update \
+    -isolation_supply_set SS_BIAS \
+    -isolation_signal iso_en \
+    -location self

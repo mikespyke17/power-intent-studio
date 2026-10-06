@@ -1,0 +1,70 @@
+library (my_sram_lib) {
+    technology (cmos);
+    delay_model : table_lookup;
+
+    type (bus8) {
+        base_type : array;
+        data_type : bit;
+        bit_width : 8;
+        bit_from : 7;
+        bit_to : 0;
+        downto : true;
+    }
+
+    cell (SRAM_256x8) {
+        area : 1200.0;
+        pg_pin (VDD) {
+            voltage_name : VDD;
+            pg_type : primary_power;
+        }
+        pg_pin (VSS) {
+            voltage_name : VSS;
+            pg_type : primary_ground;
+        }
+        pg_pin (VDDI) {
+            voltage_name : VDDI;
+            pg_type : internal_power;
+        }
+        pin (clk) {
+            direction : input;
+            capacitance : 0.01;
+        }
+        pin (we) {
+            direction : input;
+        }
+        pin (dbg) {
+            direction : internal;
+        }
+        bus (addr) {
+            bus_type : bus8;
+            direction : input;
+            pin (addr[7]) { }
+            pin (addr[6]) { }
+            pin (addr[5]) { }
+            pin (addr[4]) { }
+            pin (addr[3]) { }
+            pin (addr[2]) { }
+            pin (addr[1]) { }
+            pin (addr[0]) { }
+        }
+        bus (data) {
+            bus_type : bus8;
+            direction : inout;
+            pin (data[7]) { }
+            pin (data[6]) { }
+            pin (data[5]) { }
+            pin (data[4]) { }
+            pin (data[3]) { }
+            pin (data[2]) { }
+            pin (data[1]) { }
+            pin (data[0]) { }
+        }
+        bus (flags) {
+            direction : output;
+            pin (flags[3]) { }
+            pin (flags[2]) { }
+            pin (flags[1]) { }
+            pin (flags[0]) { }
+        }
+    }
+}

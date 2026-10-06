@@ -1,0 +1,10 @@
+set_cpf_version 2.0
+set_design top
+create_power_domain -name PD1 -default -instances {.}
+end_design
+
+set_cpf_version 1.1
+set_instance pm_inst
+set_design power_manager
+create_power_domain -name PD2 -default -instances {.}
+end_design

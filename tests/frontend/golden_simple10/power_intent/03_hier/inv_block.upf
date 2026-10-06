@@ -1,0 +1,9 @@
+# block-level file for the inverter partition (u_sub).
+# Sourced with -instance u_sub, so everything here is scoped there.
+create_supply_net VDD_INV_LOCAL
+create_supply_set SS_INV -function {power VDD_INV_LOCAL} -function {ground VSS_IO}
+
+set_retention RET_LOCAL -domain PD_ALL \
+    -retention_supply_set SS_INV \
+    -save_signal {clk posedge} \
+    -restore_signal {clk negedge}

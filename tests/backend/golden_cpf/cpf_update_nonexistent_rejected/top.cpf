@@ -1,0 +1,4 @@
+set_cpf_version 2.0
+set_design top
+update_power_domain -name NOPE -internal_power_net VDD
+end_design

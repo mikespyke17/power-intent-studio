@@ -1,0 +1,21 @@
+set_cpf_version 2.0
+
+set_design top
+
+create_power_domain -name PD_TOP -default -instances {.} -boundary_ports {clk rst_n}
+create_power_nets -nets {VDD} -voltage 1.2
+create_ground_nets -nets {VSS}
+update_power_domain -name PD_TOP -internal_power_net VDD -internal_ground_net VSS
+
+create_power_switch_rule -name sw1 -domain PD_TOP -external_power_net VDD_EXT
+
+create_isolation_rule -name ir1 -from PD_TOP -isolation_condition {en} -isolation_output high
+update_isolation_rules -names {ir1} -location from
+
+create_level_shifter_rule -name lsr1 -to {PD_TOP}
+
+create_state_retention_rule -name sr1 -domain PD_TOP -restore_edge {rst_n}
+
+create_power_mode -name PM1 -domain_conditions {PD_TOP@high} -default
+
+end_design

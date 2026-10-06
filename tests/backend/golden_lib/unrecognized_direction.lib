@@ -1,0 +1,7 @@
+library (bad_lib) {
+    cell (WEIRD_MACRO) {
+        pin (ctrl) {
+            direction : tristate;
+        }
+    }
+}

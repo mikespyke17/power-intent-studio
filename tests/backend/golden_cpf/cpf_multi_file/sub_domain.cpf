@@ -1,0 +1,1 @@
+create_power_domain -name PD_SUB -instances {u_sub}

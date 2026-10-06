@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <line x1="2" y1="12" x2="7" y2="12" stroke="#242930" stroke-width="1.5"></line>
+          <rect x="7" y="4" width="10" height="16" stroke="#242930" stroke-width="1.5"></rect>
+          <line x1="7" y1="4" x2="17" y2="20" stroke="#242930" stroke-width="1.5"></line>
+          <line x1="17" y1="12" x2="22" y2="12" stroke="#242930" stroke-width="1.5"></line>
+          <text x="12" y="14.2" font-family="Space Mono,monospace" font-size="6" font-weight="700" fill="#242930" text-anchor="middle">LS</text>
+        </svg>

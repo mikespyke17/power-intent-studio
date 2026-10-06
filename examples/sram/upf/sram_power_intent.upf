@@ -1,0 +1,155 @@
+################################################################################
+#
+#  Power Intent Studio
+#  Unified Power Format (UPF/CPF) Generator
+#
+#  Copyright (c) 2026 Power Intent Studio. All rights reserved.
+#
+#  This file was automatically generated. Manual edits may be
+#  overwritten on the next generation pass.
+#
+#  Design         : sram
+#  Format         : UPF 3.1
+#  Generated      : 2026-09-26 15:29:51
+#  Generator      : Power Intent Studio v1.0
+#
+################################################################################
+
+upf_version 3.1
+set_scope .
+
+################################################################################
+# Supply Ports
+################################################################################
+create_supply_port VDD
+create_supply_port VSS
+
+################################################################################
+# Supply Nets
+################################################################################
+create_supply_net VDD
+create_supply_net VDD_INT
+create_supply_net VSS
+
+set_scope u_sub
+create_supply_net VDD -reuse
+create_supply_net VDD_SUB
+create_supply_net VSS -reuse
+set_scope .
+
+################################################################################
+# Connect external ports to internal nets
+################################################################################
+connect_supply_net VDD -ports {VDD}
+connect_supply_net VSS -ports {VSS}
+
+################################################################################
+# Supply Sets
+################################################################################
+create_supply_set SS_VDD     -function {power VDD}     -function {ground VSS}
+
+set_scope u_sub
+create_supply_set SS_VDD_SUB -function {power VDD_SUB} -function {ground VSS}
+set_scope .
+
+################################################################################
+# Power Domains
+################################################################################
+create_power_domain PD_TOP \
+    -elements {.} \
+    -exclude_elements { \
+        u_sub \
+    } \
+    -supply {primary SS_VDD}
+
+set_scope u_sub
+create_power_domain PD_SUB \
+    -elements {.} \
+    -supply {primary SS_VDD_SUB} \
+    -available_supplies {SS_VDD}
+set_scope .
+
+################################################################################
+# Retention Strategies
+################################################################################
+set_scope u_sub
+set_retention RET_SUB \
+    -domain PD_SUB \
+    -supply {primary SS_VDD_SUB} \
+    -supply {retention SS_VDD} \
+    -elements { \
+        o_q \
+    }
+set_retention_control RET_SUB \
+    -domain PD_SUB \
+    -save_signal {save_ctrl} \
+    -restore_signal {restore_ctrl}
+set_scope .
+
+################################################################################
+# Power Switches
+################################################################################
+set_scope u_sub
+create_power_switch PG_SWITCH \
+    -domain PD_SUB \
+    -input_supply_port {VIN VDD} \
+    -output_supply_port {VOUT VDD_SUB} \
+    -control_port {CTRL pwr_switch_en} \
+    -ack_port {ACK pwr_switch_ack} \
+    -on_state {on VIN {CTRL}} \
+    -off_state {off {!CTRL}}
+map_power_switch {PG_SWITCH} \
+    -domain PD_SUB \
+    -lib_cells {TYPE_CELL_LVT_PG}
+set_scope .
+
+################################################################################
+# Isolation Rules
+################################################################################
+set_scope u_sub
+set_isolation ISO_RULE -domain PD_SUB \
+  -isolation_supply_set SS_VDD \
+  -clamp_value 0 \
+  -isolation_signal iso_control \
+  -isolation_sense low \
+  -elements { \
+        o_q \
+    } \
+  -location self
+set_scope .
+
+################################################################################
+# Port State
+################################################################################
+add_port_state VDD \
+    -state {ON 1.2} \
+    -state {RET 0.9} \
+    -state {OFF off}
+
+add_supply_state u_sub/VDD_SUB \
+    -state {ON 1.2} \
+    -state {RET 0.9} \
+    -state {OFF off}
+
+add_supply_state VDD_INT \
+    -state {ON 1.2}
+
+add_port_state VSS \
+    -state {ON 0.0}
+
+################################################################################
+# Power State Table
+################################################################################
+create_pst PST -supplies {VDD u_sub/VDD_SUB VDD_INT VSS}
+
+add_pst_state ON        -pst PST -state {ON   ON   ON  ON}
+add_pst_state IDLE      -pst PST -state {RET  RET  ON  ON}
+add_pst_state RETENTION -pst PST -state {RET  OFF  ON  ON}
+add_pst_state OFF       -pst PST -state {OFF  OFF  ON  ON}
+
+################################################################################
+# Macro Connections
+################################################################################
+connect_supply_net VDD      -ports {u_sram/VDD}
+connect_supply_net VSS      -ports {u_sram/VSS}
+connect_supply_net VDD_INT  -ports {u_sram/VDD_INT}

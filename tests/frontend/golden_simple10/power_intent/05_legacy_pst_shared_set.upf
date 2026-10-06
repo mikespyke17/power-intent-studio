@@ -1,0 +1,44 @@
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# sram -- legacy-style power intent, migrated from a 1801-2009 flow.
+# Still uses create_pst / add_pst_state for the system mode table, and
+# shares one supply set between two domains (primary for one, secondary
+# for the other).
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+set_upf_version 2.1
+
+create_supply_port VDD_TOP  -direction in
+create_supply_port VSSX     -direction in
+create_supply_net  VDD_TOP
+create_supply_net  VSSX
+create_supply_net  VDD_SUB
+connect_supply_net VDD_TOP -ports {VDD_TOP}
+connect_supply_net VSSX    -ports {VSSX}
+
+create_supply_set SSET_TOP -function {power VDD_TOP} -function {ground VSSX}
+create_supply_set SSET_SUB -function {power VDD_SUB} -function {ground VSSX}
+
+# SSET_TOP is PD_MAIN's primary AND PD_SUBBLK's secondary -- one set, two
+# domains, referenced by name from both.
+create_power_domain PD_MAIN   -elements {.} -exclude_elements {u_sub} \
+                              -supply {primary SSET_TOP}
+create_power_domain PD_SUBBLK -elements {u_sub} \
+                              -supply {primary SSET_SUB} \
+                              -available_supplies {SSET_TOP}
+
+create_power_switch SW_SUB -domain PD_SUBBLK \
+    -output_supply_port {vout VDD_SUB} \
+    -input_supply_port {vin VDD_TOP} \
+    -control_port {en sleep_b} \
+    -on_state {sw_on vin {sleep_b}}
+
+# per-rail states, referenced by the PST rows below
+add_power_state VDD_TOP -state {TOP_ON  0.9} -state {TOP_OFF off}
+add_power_state VDD_SUB -state {SUB_ON  0.9} -state {SUB_OFF off}
+add_power_state VSSX    -state {GND_ON  0.0}
+
+# ---- the legacy system mode table ------------------------------------------
+create_pst sram_pst -supplies {VDD_TOP VDD_SUB VSSX}
+
+add_pst_state MODE_RUN    -pst sram_pst -state {TOP_ON  SUB_ON  GND_ON}
+add_pst_state MODE_SUBOFF -pst sram_pst -state {TOP_ON  SUB_OFF GND_ON}
+add_pst_state MODE_ALLOFF -pst sram_pst -state {TOP_OFF SUB_OFF GND_ON}

@@ -1,0 +1,1 @@
+create_power_domain PD_TOP -elements {.}

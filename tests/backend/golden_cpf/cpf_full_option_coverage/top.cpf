@@ -1,0 +1,14 @@
+set_cpf_version 2.0
+set_design top
+
+create_power_domain -name PD1 -default -instances {.}
+
+create_power_nets -nets {VDD1 VDD2 VDD3} -voltage 1.0
+create_power_switch_rule -name sw_gnd -domain PD1 -external_ground_net VSS_EXT
+
+create_isolation_rule -name ir_pins -pins {out1 out2 out3} -exclude {out3} -isolation_condition {en}
+create_level_shifter_rule -name lsr_pins -pins {out4 out5} -exclude {out5}
+
+create_state_retention_rule -name sr_inst -instances {u_a u_b} -restore_edge {rst_n}
+
+end_design

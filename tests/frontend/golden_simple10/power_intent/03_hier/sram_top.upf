@@ -1,0 +1,37 @@
+#=============================================================================
+# top-level integration file -- sources one block file per partition
+#=============================================================================
+set_upf_version 3.1
+
+create_supply_port VDD_IO
+create_supply_port VSS_IO
+create_supply_net  VDD_IO
+create_supply_net  VSS_IO
+connect_supply_net VDD_IO -ports VDD_IO
+connect_supply_net VSS_IO -ports VSS_IO
+
+create_supply_set SS_IO -function {power VDD_IO} -function {ground VSS_IO}
+
+# one domain spanning BOTH child blocks -- a single partition that happens
+# to be physically split across the macro and the inverter
+create_power_domain PD_ALL -elements {u_sram u_sub} -supply {primary SS_IO}
+
+# level shifting on the way out of the inverter block
+set_level_shifter LS_OUT -domain PD_ALL \
+    -applies_to outputs \
+    -threshold 0.05 \
+    -rule high_to_low \
+    -location self
+set_level_shifter_cell -level_shifter LS_OUT -cell_name LSHL_X2
+
+# port attributes on the top boundary
+set_port_attributes -ports {d a} -receiver_supply SS_IO
+set_port_attributes -ports {q}   -driver_supply   SS_IO
+
+add_power_state VDD_IO -state {IO_ON 1.8}
+
+# ---- soft hierarchy: FLATTEN into this design ------------------------------
+load_upf inv_block.upf -instance u_sub
+
+# ---- macro: vendor's own file, must stay an ATTACHMENT ---------------------
+load_upf sram_macro.upf -instance u_sram

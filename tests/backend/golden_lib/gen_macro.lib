@@ -1,0 +1,20 @@
+library (gen_macro_lib) {
+    technology (cmos);
+    delay_model : table_lookup;
+
+    cell (GEN_MACRO) {
+        area : 10.0;
+        pin (clk) {
+            direction : input;
+        }
+        pin (en_b) {
+            direction : input;
+        }
+        pin (a) {
+            direction : input;
+        }
+        pin (q) {
+            direction : output;
+        }
+    }
+}

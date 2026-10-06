@@ -1,0 +1,63 @@
+#-----------------------------------------------------------------------------
+# FAKE_SRAM_256X32 integration UPF          Silicon-IP Ltd.  template v2
+# Customer: apply as-is unless the SLEEP_B polarity differs.
+#-----------------------------------------------------------------------------
+set_upf_version 3.1
+
+# supplies ...................................................................
+create_supply_port VDDC  -direction in
+create_supply_port VDDM  -direction in
+create_supply_port GND   -direction in
+create_supply_net  VDDC  ; create_supply_net VDDM ; create_supply_net GND
+create_supply_net  VDDM_GATED
+connect_supply_net VDDC -ports {VDDC}
+connect_supply_net VDDM -ports {VDDM}
+connect_supply_net GND  -ports {GND}
+
+create_supply_set SS_CORE -function {power VDDC} -function {ground GND}
+create_supply_set SS_MEM  -function {power VDDM} -function {ground GND}
+create_supply_set SS_GATED -function {power VDDM_GATED} -function {ground GND}
+
+# domains ....................................................................
+# PD_CORE covers the whole top and lends SS_MEM out as a secondary rail;
+# the macro sits in its own switched domain.
+create_power_domain PD_CORE -elements {.} -exclude_elements {u_sram} \
+                            -supply {primary SS_CORE} -available_supplies {SS_MEM}
+create_power_domain PD_SRAM -elements {u_sram} -supply {primary SS_GATED}
+
+# switch .....................................................................
+# header cell gating the macro rail off VDDM
+create_power_switch SW_MEM -domain PD_SRAM \
+    -output_supply_port {vout VDDM_GATED} \
+    -input_supply_port  {vin VDDM} \
+    -control_port       {sleep_n sleep_b} \
+    -on_state  {on_hi  vin {sleep_n}} \
+    -off_state {off_lo {!sleep_n}}
+map_power_switch -switch_name_list {SW_MEM} -lib_cells {HDRX4}
+
+# isolation ..................................................................
+# clamp the macro's read data low while its rail is collapsed
+set_isolation ISO_Q -domain PD_SRAM \
+    -isolation_supply_set SS_CORE \
+    -isolation_signal iso_en -isolation_sense high \
+    -clamp_value 0 \
+    -location parent \
+    -elements {q}
+
+# retention ..................................................................
+set_retention RET_INV -domain PD_CORE \
+    -retention_supply_set SS_MEM \
+    -elements {u_sub}
+set_retention_control RET_INV -domain PD_CORE \
+    -save_signal  {clk posedge} \
+    -restore_signal {clk negedge}
+
+# macro PG hookup ............................................................
+connect_supply_net VDDM_GATED -ports {u_sram/VDD}
+connect_supply_net GND        -ports {u_sram/VSS}
+connect_supply_net VDDC       -ports {u_sram/VDD_INT}
+
+# states .....................................................................
+add_power_state VDDC        -state {NOM 0.81}
+add_power_state VDDM        -state {NOM 0.81}
+add_power_state VDDM_GATED  -state {NOM 0.81} -state {COLLAPSED off}

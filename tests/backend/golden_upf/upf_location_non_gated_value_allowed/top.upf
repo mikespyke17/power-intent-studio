@@ -1,0 +1,4 @@
+upf_version 2.1
+
+create_power_domain PD_TOP -elements {.}
+set_isolation ISO_CORE -domain PD_TOP -source PD_TOP -sink PD_TOP -location parent

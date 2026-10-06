@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>aura_top UPF Audit</title>
+<meta name="description" content="Line-by-line audit of examples/aura_top/upf/aura_top.upf against this app's data model and generator.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* Minimal reset -- supplied by the artifact runtime when this report is
+     published, so a standalone copy has to carry it. */
+  *, *::before, *::after { box-sizing: border-box; }
+  img, svg { max-width: 100%; height: auto; }
+</style>
+<style>
+  :root {
+    --paper:      #f4f5f7;
+    --card:       #ffffff;
+    --ink:        #1b1f24;
+    --ink-soft:   #5b6873;
+    --rule:       #d9dee4;
+    --accent:     #0b6e99;
+    --ok:         #157f5c;
+    --bug:        #9c5c06;
+    --gap:        #a3302a;
+    --ok-bg:      #e6f2ed;
+    --bug-bg:     #f9eedd;
+    --gap-bg:     #f8e7e5;
+    --code-bg:    #eceff3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:    #131619;
+      --card:     #191d22;
+      --ink:      #e4e8ec;
+      --ink-soft: #94a3af;
+      --rule:     #2b3138;
+      --accent:   #5fb3d9;
+      --ok:       #5fc9a2;
+      --bug:      #e0a457;
+      --gap:      #ef8a80;
+      --ok-bg:    #16281f;
+      --bug-bg:   #2c2214;
+      --gap-bg:   #2e1a18;
+      --code-bg:  #1f242a;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:    #131619;
+    --card:     #191d22;
+    --ink:      #e4e8ec;
+    --ink-soft: #94a3af;
+    --rule:     #2b3138;
+    --accent:   #5fb3d9;
+    --ok:       #5fc9a2;
+    --bug:      #e0a457;
+    --gap:      #ef8a80;
+    --ok-bg:    #16281f;
+    --bug-bg:   #2c2214;
+    --gap-bg:   #2e1a18;
+    --code-bg:  #1f242a;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0 1.25rem 6rem;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 61rem; margin: 0 auto; }
+  .col  { max-width: 43rem; }
+
+  /* --- masthead --- */
+  header { padding: 4rem 0 2rem; border-bottom: 2px solid var(--ink); }
+  .eyebrow {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .74rem; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 .9rem;
+  }
+  h1 {
+    font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif;
+    font-weight: 700; font-size: clamp(2.1rem, 5vw, 3.1rem);
+    line-height: 1.04; letter-spacing: -.015em; margin: 0 0 1rem;
+    text-wrap: balance;
+  }
+  .standfirst { font-size: 1.08rem; color: var(--ink-soft); margin: 0; max-width: 40rem; }
+  .filepath {
+    font-family: "IBM Plex Mono", monospace; font-size: .8rem;
+    color: var(--ink-soft); margin: 1.4rem 0 0; word-break: break-all;
+  }
+
+  /* --- scoreboard --- */
+  .board { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 1px;
+           background: var(--rule); border: 1px solid var(--rule); margin: 2.5rem 0 3rem; }
+  .board > div { background: var(--card); padding: 1.15rem 1.25rem; }
+  .board .n { font-family: "IBM Plex Sans Condensed", sans-serif; font-weight: 700;
+              font-size: 2.3rem; line-height: 1; display: block; }
+  .board .k { font-family: "IBM Plex Mono", monospace; font-size: .72rem;
+              letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); }
+  .board .d { font-size: .88rem; color: var(--ink-soft); margin-top: .35rem; }
+  .n-a { color: var(--ok); } .n-b { color: var(--bug); } .n-c { color: var(--gap); }
+
+  /* --- sections --- */
+  h2 {
+    font-family: "IBM Plex Sans Condensed", sans-serif; font-weight: 700;
+    font-size: 1.65rem; letter-spacing: -.01em; margin: 3.5rem 0 .4rem;
+    padding-top: 1.4rem; border-top: 1px solid var(--rule); text-wrap: balance;
+  }
+  h3 { font-size: 1.02rem; font-weight: 600; margin: 2.2rem 0 .5rem; }
+  h3 .ln { font-family: "IBM Plex Mono", monospace; font-weight: 400;
+           font-size: .78rem; color: var(--ink-soft); margin-left: .5rem; }
+  p { margin: .75rem 0; }
+  .lede { color: var(--ink-soft); margin-top: .2rem; }
+
+  code, pre { font-family: "IBM Plex Mono", monospace; }
+  code { background: var(--code-bg); padding: .1em .34em; border-radius: 3px; font-size: .875em; }
+  pre { background: var(--code-bg); border-left: 3px solid var(--accent);
+        padding: .9rem 1.1rem; overflow-x: auto; font-size: .82rem; line-height: 1.55;
+        margin: .9rem 0; }
+  pre code { background: none; padding: 0; font-size: inherit; }
+
+  /* --- classification chips --- */
+  .chip { display: inline-block; font-family: "IBM Plex Mono", monospace;
+          font-size: .68rem; font-weight: 500; letter-spacing: .07em;
+          text-transform: uppercase; padding: .17em .5em; border-radius: 3px;
+          vertical-align: .12em; white-space: nowrap; }
+  .chip-a { background: var(--ok-bg);  color: var(--ok);  border: 1px solid var(--ok); }
+  .chip-b { background: var(--bug-bg); color: var(--bug); border: 1px solid var(--bug); }
+  .chip-c { background: var(--gap-bg); color: var(--gap); border: 1px solid var(--gap); }
+  .chip-u { background: var(--code-bg); color: var(--ink-soft); border: 1px solid var(--rule); }
+
+  /* --- tables --- */
+  .scroll { overflow-x: auto; margin: 1.2rem 0 1.6rem; border: 1px solid var(--rule); background: var(--card); }
+  table { border-collapse: collapse; width: 100%; font-size: .87rem; }
+  th, td { text-align: left; padding: .6rem .8rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  th { font-family: "IBM Plex Mono", monospace; font-size: .7rem; letter-spacing: .08em;
+       text-transform: uppercase; color: var(--ink-soft); background: var(--code-bg);
+       white-space: nowrap; position: sticky; top: 0; }
+  tr:last-child td { border-bottom: none; }
+  td.mono, th.mono { font-family: "IBM Plex Mono", monospace; font-size: .8rem; white-space: nowrap; }
+  td.num { font-variant-numeric: tabular-nums; text-align: right; }
+
+  /* --- callouts --- */
+  .note { border-left: 3px solid var(--accent); background: var(--card);
+          padding: .9rem 1.1rem; margin: 1.4rem 0; font-size: .95rem; }
+  .note.warn { border-left-color: var(--bug); }
+  .note.stop { border-left-color: var(--gap); }
+  .note strong { font-weight: 600; }
+  .note p:first-child { margin-top: 0; } .note p:last-child { margin-bottom: 0; }
+
+  ul, ol { padding-left: 1.3rem; }
+  li { margin: .4rem 0; }
+  .fine { font-size: .88rem; color: var(--ink-soft); }
+  a { color: var(--accent); }
+  footer { margin-top: 4rem; padding-top: 1.4rem; border-top: 1px solid var(--rule);
+           font-size: .85rem; color: var(--ink-soft); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">Reference-driven generation audit &middot; Phases 1&ndash;3</p>
+  <h1>aura_top UPF Audit</h1>
+  <p class="standfirst">Every construct in a real, hand-authored multi-domain SoC power-intent file, classified
+  against what this app can actually model and generate. No fixes applied &mdash; this is the evidence, for review.</p>
+  <p class="filepath">examples/aura_top/upf/aura_top.upf &middot; 534 lines &middot; UPF 3.1 &middot; 26 distinct commands</p>
+</header>
+
+<div class="board">
+  <div><span class="n n-a">14</span><span class="k">(a) correct today</span>
+       <div class="d">Modelled, and generated in syntax matching the reference.</div></div>
+  <div><span class="n n-b">10</span><span class="k">(b) real defects</span>
+       <div class="d">Concept exists; behaviour is wrong. Fixable in phase 4.</div></div>
+  <div><span class="n n-c">9</span><span class="k">(c) no data model</span>
+       <div class="d">Nothing to map onto. Needs a product decision first.</div></div>
+  <div><span class="n">5</span><span class="k">flagged uncertain</span>
+       <div class="d">Could not confirm the real UPF reading even after checking references.</div></div>
+</div>
+
+<div class="col">
+<div class="note stop">
+<p><strong>The headline result: this app's own elaborator cannot read this file at all.</strong> It fails on
+line&nbsp;19, the second command. Walking the file by neutralising each rejection in turn &mdash; the method used to
+collect the evidence below &mdash; it never reaches the end: <strong>7 commands are not registered</strong> and
+<strong>6 flags on registered commands are rejected</strong>.</p>
+<p>That is not the same as the generator being broken, and the two are kept separate throughout. Where the app
+generates a construct correctly but cannot read the reference's spelling of it, that is an importer tolerance gap,
+not a generation bug.</p>
+</div>
+
+<div class="note">
+<p><strong>One finding settles an open question from earlier today.</strong> The Name Prefix work left
+<code>set_isolation -name_prefix</code> unverified &mdash; absent from all five published option lists checked, so
+it was deliberately not emitted. <strong>This file uses it six times</strong> (L309, 319, 331, 343, 357, 369). That
+is real-world usage evidence I did not have, and it is the strongest argument yet that the flag is genuine. It does
+not by itself prove LRM membership, so it stays flagged &mdash; but it materially changes the balance.</p>
+</div>
+</div>
+
+<h2>Phase 1 &mdash; Inventory</h2>
+<p class="lede col">Organised as the file itself is. Every line reference is to the actual file; every syntax
+quotation is literal.</p>
+
+<h3>Preamble <span class="ln">L18&ndash;29</span></h3>
+<div class="scroll"><table>
+<tr><th>Construct</th><th class="num">Uses</th><th>Verified?</th><th>Class</th></tr>
+<tr><td class="mono">upf_version 3.1</td><td class="num">1</td><td>Yes &mdash; and the app now emits exactly this</td><td><span class="chip chip-a">a</span></td></tr>
+<tr><td class="mono">set_design_top aura_top</td><td class="num">1</td><td>Real UPF command</td><td><span class="chip chip-c">c</span></td></tr>
+<tr><td class="mono">set DVDD_NOM 0.80 &hellip; ($VAR use)</td><td class="num">9</td><td>Tcl built-in</td><td><span class="chip chip-a">a</span></td></tr>
+</table></div>
+<p class="fine">Nine Tcl variables carry the voltage constants and are interpolated into the state expressions
+(<code>power == {FULL_ON $DVDD_NOM}</code>). The interpreter resolves these before any handler sees them, so import
+is unaffected; generation never emits variables, which is a stylistic difference, not a defect.</p>
+
+<h3>Power domains <span class="ln">L35&ndash;40</span></h3>
+<pre><code>create_power_domain PD_TOP    -include_scope
+create_power_domain PD_AON    -elements {u_aon u_clk_rst}</code></pre>
+<p>Six domains. Five use <code>-elements</code> and are fully supported. <code>PD_TOP</code> uses
+<code>-include_scope</code> (&ldquo;this domain is the current scope&rdquo;) &mdash; <strong>rejected</strong> by the
+elaborator. Confirmed real: a published example writes <code>create_power_domain pd_DEC -include_scope</code>. The
+app already has the concept (it writes a root-level domain as <code>-elements {.}</code>), so this is a parse gap,
+not a model gap. <span class="chip chip-b">b</span></p>
+
+<h3>Supply ports and nets <span class="ln">L46&ndash;83</span></h3>
+<div class="scroll"><table>
+<tr><th>Construct</th><th class="num">Uses</th><th>Finding</th><th>Class</th></tr>
+<tr><td class="mono">create_supply_port X -domain PD_TOP</td><td class="num">6</td><td><code>-domain</code> rejected (recognised: direction, name)</td><td><span class="chip chip-b">b</span></td></tr>
+<tr><td class="mono">create_supply_net X -domain PD</td><td class="num">9</td><td>Supported</td><td><span class="chip chip-a">a</span></td></tr>
+<tr><td class="mono">create_supply_net X -domain PD -reuse</td><td class="num">10</td><td><strong>Rejected: &ldquo;supply net already exists at scope&rdquo;</strong></td><td><span class="chip chip-b">b</span></td></tr>
+<tr><td class="mono">connect_supply_net X -ports {X}</td><td class="num">6</td><td>Supported; the app emits this section</td><td><span class="chip chip-a">a</span></td></tr>
+</table></div>
+<div class="note warn">
+<p><strong>The <code>-reuse</code> rejection is a defect in this project's own most recent work.</strong> The flag
+was added two commits ago and is accepted by the parser &mdash; but the duplicate-name check runs first and fires,
+because this file scopes nets by <code>-domain</code> rather than by <code>set_scope</code>, leaving every net at
+scope <code>""</code>. So <code>create_supply_net VDD_AON -domain PD_CPU -reuse</code> collides with the root
+<code>VDD_AON</code> and the file is rejected.</p>
+<p>This is precisely the construct that means &ldquo;this is the same net, continued&rdquo;. Rejecting it as a
+duplicate inverts its meaning.</p>
+</div>
+
+<h3>Supply sets and domain association <span class="ln">L89&ndash;110</span></h3>
+<pre><code>create_supply_set SS_TOP -function {power VDD_TOP} -function {ground VSS}
+associate_supply_set SS_TOP -handle PD_TOP.primary
+associate_supply_set SS_AON -handle PD_CPU.default_isolation
+associate_supply_set SS_RET -handle PD_CPU.default_retention</code></pre>
+<p>Seven supply sets, eleven associations. <strong>All supported</strong>, and the <code>-function</code> spelling
+is exactly what the generator now emits after this morning's fix. The <code>.default_isolation</code> /
+<code>.default_retention</code> handles normalise onto <code>available_supplies</code>, which was implemented
+deliberately in an earlier pass. <span class="chip chip-a">a</span></p>
+
+<h3>Power switches <span class="ln">L116&ndash;145</span></h3>
+<pre><code>create_power_switch SW_CPU \
+  -domain              PD_CPU \
+  -input_supply_port  {vin  VDD_TOP} \
+  -output_supply_port {vout VDD_CPU} \
+  -control_port       {sleep_n pwr_en_w[2]} \
+  -ack_port           {ack     pwr_ack_w[2]} \
+  -on_state           {on_state  vin {sleep_n}} \
+  -off_state          {off_state    {!sleep_n}}
+
+map_power_switch SW_CPU -domain PD_CPU -lib_cells {HDR_X16 HDR_X8}</code></pre>
+<p>Three switches, structurally identical apart from domain, rails and control-bit index.
+<code>create_power_switch</code> is <strong>fully supported on every flag</strong>, <code>-ack_port</code> included
+&mdash; which was added earlier today, and this file independently confirms both its existence and its
+<code>{port net}</code> shape. <span class="chip chip-a">a</span></p>
+<p>Two problems on the mapping command: <code>-domain</code> is <strong>rejected</strong>
+<span class="chip chip-b">b</span>, and <code>-lib_cells {HDR_X16 HDR_X8}</code> carries <strong>two cells</strong>
+where the app keeps only the first <span class="chip chip-b">b</span>. The switch name is positional here, matching
+the correction made earlier today.</p>
+
+<h3>Supply-set power states <span class="ln">L151&ndash;181</span></h3>
+<pre><code>add_power_state SS_TOP -supply \
+  -state HV  {-supply_expr {power == {FULL_ON $DVDD_NOM} && ground == {FULL_ON 0.00}}} \
+  -state LV  {-supply_expr {power == {FULL_ON $DVDD_LOW} && ground == {FULL_ON 0.00}}}</code></pre>
+<p>Seven commands, 19 states. Two independent problems, both <strong>rejected</strong>:</p>
+<ul>
+<li><strong>The bare <code>-supply</code> marker.</strong> The object name is positional and <code>-supply</code> is
+a bare marker meaning &ldquo;the object is a supply set&rdquo;. The app registers <code>-supply</code> as
+<em>taking a value</em>, so it swallows the following <code>-state</code> and the parse collapses. Measured
+directly: <code>add_power_state -supply SS -state {&hellip;}</code> works, <code>add_power_state SS -state
+{&hellip;}</code> works, <code>add_power_state SS -supply -state {&hellip;}</code> fails. <span class="chip chip-b">b</span></li>
+<li><strong>The split <code>-state NAME {flags}</code> form.</strong> The app expects the name <em>inside</em> the
+group (<code>-state {NAME -supply_expr &hellip;}</code>), which is the LRM's own signature. The reference puts the
+name outside. Both forms occur in published material, so this is a tolerance gap, not a reference error.
+<span class="chip chip-b">b</span></li>
+</ul>
+<p><code>add_power_state SS_MEM &hellip; -state RET {-supply_expr {power == {ON $MVDD_RET}}}</code> (L171) uses the
+state type <code>ON</code>, which is not one of the four values this app's redesigned vocabulary admits
+(FULL_ON / PARTIAL_ON / OFF / UNDETERMINED). The importer's fallback silently reinterprets an unknown token carrying
+a level as FULL_ON, so this arrives as <code>FULL_ON 0.60</code>. <span class="chip chip-b">b</span>
+<span class="chip chip-u">uncertain</span></p>
+
+<h3>Domain power states <span class="ln">L187&ndash;243</span></h3>
+<pre><code>add_power_state PD_CPU -domain \
+  -state RETAIN  {-supply_expr {SS_CPU == OFF && SS_RET == ON} \
+                  -logic_expr  {iso_en_w[2] == 1}}
+
+add_power_state PD_TOP -domain \
+  -state PS_TURBO {-supply_expr {SS_TOP == HV} \
+                   -logic_expr  {PD_CPU == RUN_HV && PD_DSP == RUN_BOOST && &hellip;}}</code></pre>
+<p>Six commands, 25 states &mdash; and structurally <strong>the most important thing in the file</strong>. Each
+per-domain state names a condition over its supply sets' states; <code>PD_TOP</code>'s seven states then compose the
+other five domains' states into the system modes the RTL sequencer walks
+(<code>aura_pmu_pkg::power_state_e</code> uses the same names).</p>
+<p><strong>This app has no data model for it at all.</strong> <code>PowerState.domain</code> is classified
+UNMODELLED with the reason &ldquo;a power state is attached to a supply here, never to a domain directly&rdquo;. The
+Power State Table models one flat table of per-net values; it has no notion of a domain-level state, nor of one
+state's expression referring to another state by name. <span class="chip chip-c">c</span></p>
+
+<h3>State transitions <span class="ln">L247&ndash;255</span></h3>
+<pre><code>add_state_transition PST_T1 -object PD_TOP -from PS_TURBO -to PS_NOM      -legal
+add_state_transition PST_T9 -object PD_TOP -from PS_TURBO -to PS_SHUTDOWN -illegal</code></pre>
+<p>Nine transitions &mdash; a legality graph over <code>PD_TOP</code>'s system states, eight legal and one explicitly
+illegal. The command is <strong>not registered</strong>, and there is no entity, dialog or field anywhere in the app
+for a transition between states. <span class="chip chip-c">c</span></p>
+
+<h3>Classic power state table <span class="ln">L261&ndash;293</span></h3>
+<pre><code>add_port_state VDD_MEM -state {ON $MVDD_NOM} -state {RET $MVDD_RET} -state {OFF off}
+add_port_state SW_CPU/vout -state {ON_HV $DVDD_NOM} &hellip;
+create_pst AURA_PST -supplies { VDD_TOP VDD_AON &hellip; SW_CPU/vout &hellip; }
+add_pst_state PS_TURBO -pst AURA_PST -state {HV HV BOOST ON ON ON_HV BOOST ON_HV}</code></pre>
+<p>The file deliberately keeps a legacy PST <em>alongside</em> the modern states, &ldquo;for tools and flows that
+consume create_pst&rdquo; (its own comment, L7).</p>
+<ul>
+<li><code>add_port_state</code>, 9 uses &mdash; <strong>not registered</strong>, no model. Three of them take a
+<em>switch output port</em> (<code>SW_CPU/vout</code>) as the state object. <span class="chip chip-c">c</span>
+<span class="chip chip-u">uncertain</span></li>
+<li><code>create_pst</code> / <code>add_pst_state</code> &mdash; registered and importable. But on the generation
+side, <strong><code>_power_state_table_upf_lines()</code> is dead code</strong>: the function still exists and still
+produces correct <code>create_pst</code>/<code>add_pst_state</code> text, and <em>nothing calls it</em> &mdash;
+confirmed by grep across <code>frontend/</code> and <code>tests/</code>. The power-states redesign replaced it with
+the two-tier model and left it behind. The app therefore cannot emit a legacy PST at all.
+<span class="chip chip-b">b</span></li>
+</ul>
+
+<h3>Isolation <span class="ln">L301&ndash;376</span></h3>
+<pre><code>set_isolation ISO_CPU_LOW \
+  -domain            PD_CPU \
+  -applies_to        outputs \
+  -clamp_value       0 \
+  -isolation_supply_set SS_AON \
+  -isolation_signal  iso_en_w[2] \
+  -isolation_sense   high \
+  -location          parent \
+  -name_prefix       iso_cpu_
+
+map_isolation_cell ISO_CPU_LOW -domain PD_CPU -lib_cells {ISO_AND_X4}</code></pre>
+<p>Six strategies. <strong>Every flag on <code>set_isolation</code> is supported</strong>, including
+<code>-name_prefix</code> (see the note at the top) and the numeric <code>-clamp_value 0|1</code>, which the
+generator already translates from its internal low/high/keep. <span class="chip chip-a">a</span></p>
+<p>Two element lists are worth noting as inputs the resolver must cope with:
+<code>-elements {u_cpu/mem_port}</code> (an interface port, L313) and
+<code>-elements {u_periph/uart_txd u_periph/spi_csn u_periph/apb.pready}</code> (L351) &mdash; the last being a
+<em>dotted interface-member</em> path.</p>
+<p><code>map_isolation_cell</code>, 6 uses: <strong>not registered</strong>, and
+<code>IsolationStrategyPlacement</code> has <strong>no <code>cell_type</code> field at all</strong> &mdash; verified
+by grep. Isolation is the one strategy type here with no cell binding, so there is nothing to generate from.
+Signature confirmed against a reference: <code>map_isolation_cell name -domain d [-elements] [-lib_cells]</code>.
+<span class="chip chip-c">c</span></p>
+
+<h3>Retention <span class="ln">L384&ndash;414</span></h3>
+<pre><code>set_retention RET_CPU_RF \
+  -domain              PD_CPU \
+  -elements            {u_cpu/u_core/u_rf} \
+  -retention_supply_set SS_RET \
+  -save_signal         {ret_save_w[2] posedge} \
+  -restore_signal      {ret_restore_w[2] posedge} \
+  -retention_condition {!pwr_en_w[2] || iso_en_w[2]}
+
+set_retention_control RET_CPU_RF -domain PD_CPU \
+  -save_signal    {ret_save_w[2] high} \
+  -restore_signal {ret_restore_w[2] high} \
+  -assert_r_mutex {ret_save_w[2] high ret_restore_w[2] high}
+
+map_retention_cell RET_CPU_RF -domain PD_CPU -lib_cells {RSDFFQ_X1 RSDFFQ_X2}</code></pre>
+<p>Two strategies. The core &mdash; domain, elements, retention supply set, save/restore &mdash; is supported.
+Three things are not:</p>
+<ul>
+<li><strong>The edge/level half of the signal pairs.</strong> <code>{ret_save_w[2] posedge}</code> is a pair; the
+app models save/restore as a single free-text string, so <code>posedge</code> (and
+<code>set_retention_control</code>'s <code>high</code>) has nowhere to live. <span class="chip chip-c">c</span></li>
+<li><code>-retention_condition {!pwr_en_w[2] || iso_en_w[2]}</code> &mdash; no field, no boolean-expression editor.
+<span class="chip chip-c">c</span></li>
+<li><code>-assert_r_mutex</code> &mdash; a save/restore mutual-exclusion assertion. No model.
+<span class="chip chip-c">c</span></li>
+<li><code>map_retention_cell</code>, 2 uses &mdash; not registered, and
+<code>RetentionStrategyPlacement</code> has no <code>cell_type</code> field. <span class="chip chip-c">c</span></li>
+</ul>
+
+<h3>Level shifters <span class="ln">L422&ndash;482</span></h3>
+<pre><code>set_level_shifter LS_PMU_CTRL \
+  -domain      PD_AON \
+  -elements    {u_aon/ch} \
+  -rule        both \
+  -threshold   0.08 \
+  -location    parent \
+  -force_shift \
+  -name_prefix ls_pmu_
+
+map_level_shifter_cell LS_PMU_CTRL -domain PD_AON -lib_cells {ELS_X2}</code></pre>
+<p>Six strategies. <code>-domain</code>, <code>-applies_to</code>, <code>-rule</code>, <code>-threshold</code>,
+<code>-location</code>, <code>-elements</code> and <code>-name_prefix</code> are all supported &mdash; the prefix as
+of today, and this file confirms the flag on this command too. <span class="chip chip-a">a</span></p>
+<ul>
+<li><code>-force_shift</code> (L474) &mdash; appears in this codebase only inside a comment. No field, not emitted.
+Its <code>-no_shift</code> sibling is equally real and equally absent. <span class="chip chip-c">c</span></li>
+<li><strong>Different cell-mapping command.</strong> The reference uses
+<code>map_level_shifter_cell LS -domain PD -lib_cells {A B}</code>; the app emits
+<code>set_level_shifter_cell -level_shifter LS -cell_name A</code>. Both commands appear to be real, but the
+reference's is the one confirmed against a signature reference, it carries <code>-domain</code>, and it takes a cell
+<em>list</em> where the app has a single free-text name. <span class="chip chip-b">b</span></li>
+</ul>
+
+<h3>Macro supply connections <span class="ln">L496&ndash;509</span></h3>
+<pre><code>foreach bank {0 1 2 3} {
+  connect_supply_net VDD_MEM \
+    -ports "u_mem/g_bank\[$bank\].u_bank/u_wrap/g_1024x32.u_macro/VDD"
+}
+connect_supply_net VDD_CPU -ports {u_cpu/u_icache/u_tag_array/g_128x32.u_macro/VDD}</code></pre>
+<p>Fourteen <code>connect_supply_net</code> calls in total, eight of them generated by a Tcl <code>foreach</code>.
+The command and the hierarchical pin-path form are <strong>supported</strong> &mdash; this is exactly the shape the
+app's own &ldquo;Macro Connections&rdquo; section emits. <span class="chip chip-a">a</span></p>
+<p>Two properties of the paths are worth recording as resolver input, since both are unusual: escaped generate-block
+brackets (<code>g_bank\[0\]</code>) and dotted generate labels (<code>g_1024x32.u_macro</code>). Both resolve to
+plain strings before any handler sees them, so parsing is unaffected; whether the RTL <em>resolver</em> can match
+them against an elaborated hierarchy is a separate question this audit did not test.</p>
+
+<h3>Port attributes <span class="ln">L515&ndash;530</span></h3>
+<pre><code>set_port_attributes -ports {clk_ref rst_ext_n} -driver_supply SS_AON -receiver_supply SS_AON
+set_port_attributes -ports {uart_txd spi_sclk spi_mosi spi_csn gpio_out gpio_oe} -driver_supply SS_PER
+set_related_supply_net -object_list {irq_o wake_o} -power VDD_TOP -ground VSS</code></pre>
+<p>Five <code>set_port_attributes</code>, all <strong>supported</strong>, including multi-port lists and the
+driver-only / receiver-only forms. <span class="chip chip-a">a</span></p>
+<p><code>set_related_supply_net</code> &mdash; <strong>not registered</strong>, no model. I could not confirm this
+command against any reference; it may be a UPF&nbsp;1.0-era construct superseded by <code>set_port_attributes</code>,
+in which case the right response is to reject it rather than model it.
+<span class="chip chip-c">c</span> <span class="chip chip-u">uncertain</span></p>
+
+<h2>Phase 2 &mdash; Classification summary</h2>
+
+<h3>(b) Real defects &mdash; concept exists, behaviour is wrong</h3>
+<p class="lede">Each names the code responsible. These are phase-4 work.</p>
+<div class="scroll"><table>
+<tr><th>#</th><th>Defect</th><th>Where</th></tr>
+<tr><td class="mono">B1</td><td><code>-reuse</code> net rejected as a duplicate. Highest priority: it blocks the file, and it is a defect in this project's own two-commits-ago work.</td><td class="mono">upf/verbs.py<br>_create_supply_net</td></tr>
+<tr><td class="mono">B2</td><td><code>add_power_state OBJ -supply</code> &mdash; bare marker not accepted; <code>-supply</code> is registered as value-taking only.</td><td class="mono">upf/elaborate.py<br>+ _add_power_state</td></tr>
+<tr><td class="mono">B3</td><td><code>-state NAME {flags}</code> split form not accepted (only <code>-state {NAME flags}</code>).</td><td class="mono">upf/verbs.py<br>_nested_state_expr</td></tr>
+<tr><td class="mono">B4</td><td><code>map_power_switch -domain</code> unrecognised.</td><td class="mono">upf/elaborate.py</td></tr>
+<tr><td class="mono">B5</td><td><code>-lib_cells {A B}</code> multi-cell list truncated to the first entry (2 of 3 switches, 3 of 6 level shifters, 1 of 2 retention cells use two cells).</td><td class="mono">_map_power_switch</td></tr>
+<tr><td class="mono">B6</td><td><code>create_supply_port -domain</code> unrecognised.</td><td class="mono">upf/elaborate.py</td></tr>
+<tr><td class="mono">B7</td><td><code>create_power_domain -include_scope</code> unrecognised. Model already has the concept (<code>-elements {.}</code>).</td><td class="mono">upf/elaborate.py</td></tr>
+<tr><td class="mono">B8</td><td>Legacy-PST generator is dead code &mdash; defined, correct, never called. The app cannot emit <code>create_pst</code> at all.</td><td class="mono">power_intent_text_export.py<br>_power_state_table_upf_lines</td></tr>
+<tr><td class="mono">B9</td><td>Supply state type <code>ON</code> silently reinterpreted as <code>FULL_ON</code> by the unknown-token fallback.</td><td class="mono">power_intent_import.py<br>_rail_state</td></tr>
+<tr><td class="mono">B10</td><td>Level-shifter cell mapping uses <code>set_level_shifter_cell -cell_name</code> (one cell, no domain) where the reference and a signature reference use <code>map_level_shifter_cell -domain -lib_cells</code>.</td><td class="mono">power_intent_text_export.py</td></tr>
+</table></div>
+
+<h3>(c) No data model &mdash; needs a product decision, not a fix</h3>
+<div class="scroll"><table>
+<tr><th>#</th><th>Construct</th><th>What it does, and why there is nowhere to put it</th></tr>
+<tr><td class="mono">C1</td><td>Domain power states<br><span class="fine">6 commands, 25 states</span></td><td>States declared on a <em>domain</em>, whose conditions reference supply-set states and, for <code>PD_TOP</code>, other domains' states by name. The app attaches every state to a supply and models one flat per-net table; it has no domain-level state, and no expression language that can name another state.</td></tr>
+<tr><td class="mono">C2</td><td><code>add_state_transition</code><br><span class="fine">9 commands</span></td><td>A legality graph over a domain's states (legal/illegal edges). No entity, dialog or field exists for a relationship <em>between</em> two states.</td></tr>
+<tr><td class="mono">C3</td><td><code>add_port_state</code><br><span class="fine">9 commands</span></td><td>Per-port state/voltage tables feeding the legacy PST, three of them on a switch output port. The app derives net states from its own table rather than declaring them per port.</td></tr>
+<tr><td class="mono">C4</td><td><code>map_isolation_cell</code>, <code>map_retention_cell</code><br><span class="fine">8 commands</span></td><td>Bind a strategy to library cells. Neither <code>IsolationStrategyPlacement</code> nor <code>RetentionStrategyPlacement</code> has a <code>cell_type</code> field &mdash; only Power Switch and Level Shifter do.</td></tr>
+<tr><td class="mono">C5</td><td>Retention signal <em>edges</em></td><td><code>{sig posedge}</code> / <code>{sig high}</code> are pairs; the app stores one free-text string per signal, so the edge or level qualifier has nowhere to go.</td></tr>
+<tr><td class="mono">C6</td><td><code>-retention_condition</code></td><td>A boolean condition gating retention. No field, and no boolean-expression editor anywhere in the app.</td></tr>
+<tr><td class="mono">C7</td><td><code>-assert_r_mutex</code></td><td>Asserts save and restore are mutually exclusive. A verification assertion, not structural intent &mdash; arguably out of scope by design.</td></tr>
+<tr><td class="mono">C8</td><td><code>-force_shift</code> / <code>-no_shift</code></td><td>Force or suppress level-shifter insertion regardless of the threshold rule. Both real, both absent.</td></tr>
+<tr><td class="mono">C9</td><td><code>set_design_top</code>, <code>set_related_supply_net</code></td><td>The first names the elaboration root, which this app takes from the loaded RTL instead. The second could not be verified at all.</td></tr>
+</table></div>
+
+<h2>Flagged uncertain</h2>
+<p class="lede col">Surfaced rather than silently resolved, per the audit's own rules.</p>
+<ol class="col">
+<li><strong><code>set_isolation -name_prefix</code></strong> &mdash; used 6&times; here; absent from all five published
+option lists checked. Real-world evidence now points strongly to it being genuine, but LRM membership is unconfirmed.
+This is the one item where access to the actual standard would change a decision already taken today.</li>
+<li><strong><code>map_power_switch -domain</code></strong> &mdash; the other three <code>map_*_cell</code> commands
+take <code>-domain</code> as a <em>required</em> argument, confirmed against a signature reference. For
+<code>map_power_switch</code> specifically I found no signature that includes it, and one tool reference that omits
+it. The file's consistency across all four argues it is right.</li>
+<li><strong><code>set_related_supply_net</code></strong> &mdash; no reference found. Possibly UPF&nbsp;1.0-era.</li>
+<li><strong>The supply state name <code>ON</code></strong> (L171) &mdash; the standard supply-state vocabulary is
+FULL_ON / PARTIAL_ON / OFF / UNDETERMINED. Whether <code>ON</code> is a legal alias, a user-defined name, or an
+error in the reference is unresolved; the app currently reinterprets it as FULL_ON without saying so.</li>
+<li><strong><code>add_port_state</code> on a switch output port</strong> (<code>SW_CPU/vout</code>) &mdash;
+plausible and internally consistent with <code>create_pst -supplies</code> listing the same paths, but unverified.</li>
+</ol>
+
+<h2>What this does <em>not</em> claim</h2>
+<div class="col">
+<p>The audit tested the <strong>elaborator</strong> against the file empirically, and compared the
+<strong>generator</strong> to it by tracing code and checking the feature classification. It did not test whether the
+<strong>RTL resolver</strong> can match this file's hierarchical paths against the elaborated
+<code>aura_top</code> design &mdash; the escaped generate-block brackets and dotted generate labels in section 11 are
+the obvious risk there, and that is a separate exercise.</p>
+<p>Nor does it propose implementations for anything in category (c). Several of those &mdash; domain power states and
+the transition graph in particular &mdash; are large enough to be product decisions rather than features, and one
+(<code>-assert_r_mutex</code>) may be correctly out of scope given this project's stated
+&ldquo;not signoff-grade verification&rdquo; boundary.</p>
+</div>
+
+<footer>
+Phases 1&ndash;3 only. No code changed. Category&nbsp;(b) fixes await review of this report;
+category&nbsp;(c) items await a separate decision.
+</footer>
+
+</div>
+
+</body>
+</html>

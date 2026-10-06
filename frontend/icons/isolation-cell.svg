@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M3 4 L12 4 A8 8 0 0 1 12 20 L3 20 Z" stroke="#242930" stroke-width="1.5"></path>
+          <line x1="0" y1="9" x2="3" y2="9" stroke="#242930" stroke-width="1.5"></line>
+          <line x1="0" y1="15" x2="3" y2="15" stroke="#242930" stroke-width="1.5"></line>
+          <line x1="20" y1="12" x2="23" y2="12" stroke="#242930" stroke-width="1.5"></line>
+          <text x="9.2" y="14.2" font-family="Space Mono,monospace" font-size="6.5" letter-spacing="-0.4" font-weight="700" fill="#242930" text-anchor="middle">ISO</text>
+        </svg>

@@ -1,0 +1,1273 @@
+/* -------------------------------------------------------------------------
+ * aura_sram_ss_0p72v_125c.lib
+ *
+ * Liberty models for the AURA SoC memory macros.
+ * Corner: SS, 0.72 V, 125.0 C
+ *
+ * Cell names match the RTL module names instantiated in
+ * rtl/macro/sram_wrap.sv, so a Liberty-to-RTL binding pass resolves them
+ * directly.  Power-aware attributes that matter for the UPF:
+ *
+ *   pg_pin              VDD / VSS, connected explicitly by connect_supply_net
+ *   power_down_function on every output bus, so outputs are corrupt when the
+ *                       rail collapses and isolation is required
+ *   retention_pin       on RETN, matching the PD_MEM retention strategy
+ *   leakage_power/when  three states: active, retained, powered down
+ *
+ * Timing and power values are representative, not silicon-characterised.
+ * ------------------------------------------------------------------------- */
+
+library (aura_sram_ss_0p72v_125c) {
+
+  technology (cmos);
+  delay_model : table_lookup;
+  library_features (report_delay_calculation);
+
+  time_unit : "1ns";
+  voltage_unit : "1V";
+  current_unit : "1mA";
+  pulling_resistance_unit : "1kohm";
+  leakage_power_unit : "1nW";
+  capacitive_load_unit (1, pf);
+
+  nom_process : 1.2;
+  nom_temperature : 125.0;
+  nom_voltage : 0.72;
+
+  voltage_map (VDD, 0.72);
+  voltage_map (VSS, 0.00);
+
+  operating_conditions (ss_0p72v_125c) {
+    process : 1.2;
+    temperature : 125.0;
+    voltage : 0.72;
+    tree_type : balanced_tree;
+  }
+  default_operating_conditions : ss_0p72v_125c;
+
+  input_threshold_pct_rise : 50.0;
+  input_threshold_pct_fall : 50.0;
+  output_threshold_pct_rise : 50.0;
+  output_threshold_pct_fall : 50.0;
+  slew_lower_threshold_pct_rise : 30.0;
+  slew_lower_threshold_pct_fall : 30.0;
+  slew_upper_threshold_pct_rise : 70.0;
+  slew_upper_threshold_pct_fall : 70.0;
+  slew_derate_from_library : 1.0;
+
+  default_leakage_power_density : 0.0;
+  default_cell_leakage_power : 0.0;
+  default_max_transition : 0.4000;
+  default_fanout_load : 1.0;
+  default_inout_pin_cap : 0.0;
+  default_input_pin_cap : 0.0;
+  default_output_pin_cap : 0.0;
+
+  lu_table_template (mem_delay) {
+    variable_1 : input_net_transition;
+    variable_2 : total_output_net_capacitance;
+    index_1 ("0.0100, 0.0400, 0.1600, 0.4000");
+    index_2 ("0.0020, 0.0080, 0.0320, 0.1000");
+  }
+
+  lu_table_template (mem_constraint) {
+    variable_1 : related_pin_transition;
+    variable_2 : constrained_pin_transition;
+    index_1 ("0.0100, 0.0400, 0.1600, 0.4000");
+    index_2 ("0.0100, 0.0400, 0.1600, 0.4000");
+  }
+
+  power_lut_template (mem_energy) {
+    variable_1 : input_transition_time;
+    index_1 ("0.0100, 0.0400, 0.1600, 0.4000");
+  }
+
+  power_lut_template (mem_energy_2d) {
+    variable_1 : input_transition_time;
+    variable_2 : total_output_net_capacitance;
+    index_1 ("0.0100, 0.0400, 0.1600, 0.4000");
+    index_2 ("0.0020, 0.0080, 0.0320, 0.1000");
+  }
+
+  type (bus_4) {
+    base_type : array;
+    data_type : bit;
+    bit_width : 4;
+    bit_from : 3;
+    bit_to : 0;
+    downto : true;
+  }
+
+  type (bus_7) {
+    base_type : array;
+    data_type : bit;
+    bit_width : 7;
+    bit_from : 6;
+    bit_to : 0;
+    downto : true;
+  }
+
+  type (bus_9) {
+    base_type : array;
+    data_type : bit;
+    bit_width : 9;
+    bit_from : 8;
+    bit_to : 0;
+    downto : true;
+  }
+
+  type (bus_10) {
+    base_type : array;
+    data_type : bit;
+    bit_width : 10;
+    bit_from : 9;
+    bit_to : 0;
+    downto : true;
+  }
+
+  type (bus_32) {
+    base_type : array;
+    data_type : bit;
+    bit_width : 32;
+    bit_from : 31;
+    bit_to : 0;
+    downto : true;
+  }
+
+  cell (sram_1rw_1024x32) {
+    /* mem_subsys SRAM banks (4 instances) */
+    area : 6699.7;
+    dont_touch : true;
+    dont_use : true;
+    is_macro_cell : true;
+    interface_timing : true;
+    pad_cell : false;
+    cell_leakage_power : 4177.31;
+
+    memory () {
+      type : ram;
+      address_width : 10;
+      word_width : 32;
+    }
+
+    pg_pin (VDD) {
+      voltage_name : VDD;
+      pg_type : primary_power;
+    }
+
+    pg_pin (VSS) {
+      voltage_name : VSS;
+      pg_type : primary_ground;
+    }
+
+    pin (CLK) {
+      direction : input;
+      clock : true;
+      capacitance : 0.0180;
+      max_transition : 0.4000;
+      min_pulse_width_high : 0.2400;
+      min_pulse_width_low : 0.2400;
+      min_period : 0.9600;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      internal_power () {
+        rise_power (mem_energy) {
+          values ("0.04416, 0.05211, 0.06006, 0.06801");
+        }
+        fall_power (mem_energy) {
+          values ("0.03798, 0.04481, 0.05165, 0.05849");
+        }
+      }
+    }
+
+    pin (CEN) {
+      direction : input;
+      capacitance : 0.0065;
+      max_transition : 0.4000;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      timing () {
+        related_pin : "CLK";
+        timing_type : setup_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+      }
+      timing () {
+        related_pin : "CLK";
+        timing_type : hold_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+      }
+    }
+
+    pin (WEN) {
+      direction : input;
+      capacitance : 0.0065;
+      max_transition : 0.4000;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      timing () {
+        related_pin : "CLK";
+        timing_type : setup_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+      }
+      timing () {
+        related_pin : "CLK";
+        timing_type : hold_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+      }
+    }
+
+    bus (BEN) {
+      bus_type : bus_4;
+      direction : input;
+      capacitance : 0.0062;
+      max_transition : 0.4000;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      timing () {
+        related_pin : "CLK";
+        timing_type : setup_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+      }
+      timing () {
+        related_pin : "CLK";
+        timing_type : hold_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+      }
+    }
+
+    bus (A) {
+      bus_type : bus_10;
+      direction : input;
+      capacitance : 0.0062;
+      max_transition : 0.4000;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      timing () {
+        related_pin : "CLK";
+        timing_type : setup_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+      }
+      timing () {
+        related_pin : "CLK";
+        timing_type : hold_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+      }
+    }
+
+    bus (D) {
+      bus_type : bus_32;
+      direction : input;
+      capacitance : 0.0062;
+      max_transition : 0.4000;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      timing () {
+        related_pin : "CLK";
+        timing_type : setup_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+      }
+      timing () {
+        related_pin : "CLK";
+        timing_type : hold_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+      }
+    }
+
+    bus (Q) {
+      bus_type : bus_32;
+      direction : output;
+      max_capacitance : 0.1000;
+      max_transition : 0.4000;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      power_down_function : "!VDD + VSS";
+      timing () {
+        related_pin : "CLK";
+        timing_type : rising_edge;
+        timing_sense : non_unate;
+        cell_rise (mem_delay) {
+          values ("1.4050, 1.4284, 1.5224, 1.7887",\
+               "1.4152, 1.4390, 1.5342, 1.8037",\
+               "1.4564, 1.4814, 1.5811, 1.8637",\
+               "1.5388, 1.5660, 1.6750, 1.9837");
+        }
+        rise_transition (mem_delay) {
+          values ("0.0632, 0.0867, 0.1807, 0.4470",\
+               "0.0735, 0.0973, 0.1924, 0.4620",\
+               "0.1147, 0.1396, 0.2394, 0.5220",\
+               "0.1971, 0.2243, 0.3333, 0.6420");
+        }
+        cell_fall (mem_delay) {
+          values ("1.3492, 1.3727, 1.4667, 1.7330",\
+               "1.3595, 1.3833, 1.4784, 1.7480",\
+               "1.4007, 1.4256, 1.5254, 1.8080",\
+               "1.4830, 1.5103, 1.6192, 1.9280");
+        }
+        fall_transition (mem_delay) {
+          values ("0.0592, 0.0827, 0.1767, 0.4430",\
+               "0.0695, 0.0933, 0.1884, 0.4580",\
+               "0.1107, 0.1356, 0.2354, 0.5180",\
+               "0.1931, 0.2203, 0.3293, 0.6380");
+        }
+      }
+    }
+
+    pin (RETN) {
+      direction : input;
+      capacitance : 0.0058;
+      max_transition : 0.4000;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      timing () {
+        related_pin : "RETN";
+        timing_type : min_pulse_width;
+        rise_constraint (scalar) { values ("1.9200"); }
+        fall_constraint (scalar) { values ("1.9200"); }
+      }
+    }
+
+    pin (PDN) {
+      direction : input;
+      capacitance : 0.0058;
+      max_transition : 0.4000;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      timing () {
+        related_pin : "PDN";
+        timing_type : min_pulse_width;
+        rise_constraint (scalar) { values ("3.8400"); }
+        fall_constraint (scalar) { values ("3.8400"); }
+      }
+    }
+
+    /* Leakage is state dependent: the retention state is what the
+       UPF PD_MEM retention strategy trades read/write access for. */
+    leakage_power () {
+      when : "PDN & RETN";
+      value : 4177.31;
+    }
+    leakage_power () {
+      when : "PDN & !RETN";
+      value : 459.5;
+    }
+    leakage_power () {
+      when : "!PDN";
+      value : 8.35;
+    }
+  }
+
+  cell (sram_1rw_128x32) {
+    /* icache tag and data arrays (2 instances) */
+    area : 2456.2;
+    dont_touch : true;
+    dont_use : true;
+    is_macro_cell : true;
+    interface_timing : true;
+    pad_cell : false;
+    cell_leakage_power : 1978.16;
+
+    memory () {
+      type : ram;
+      address_width : 7;
+      word_width : 32;
+    }
+
+    pg_pin (VDD) {
+      voltage_name : VDD;
+      pg_type : primary_power;
+    }
+
+    pg_pin (VSS) {
+      voltage_name : VSS;
+      pg_type : primary_ground;
+    }
+
+    pin (CLK) {
+      direction : input;
+      clock : true;
+      capacitance : 0.0180;
+      max_transition : 0.4000;
+      min_pulse_width_high : 0.2400;
+      min_pulse_width_low : 0.2400;
+      min_period : 0.9600;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      internal_power () {
+        rise_power (mem_energy) {
+          values ("0.03632, 0.04286, 0.04940, 0.05593");
+        }
+        fall_power (mem_energy) {
+          values ("0.03124, 0.03686, 0.04248, 0.04810");
+        }
+      }
+    }
+
+    pin (CEN) {
+      direction : input;
+      capacitance : 0.0065;
+      max_transition : 0.4000;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      timing () {
+        related_pin : "CLK";
+        timing_type : setup_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+      }
+      timing () {
+        related_pin : "CLK";
+        timing_type : hold_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+      }
+    }
+
+    pin (WEN) {
+      direction : input;
+      capacitance : 0.0065;
+      max_transition : 0.4000;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      timing () {
+        related_pin : "CLK";
+        timing_type : setup_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+      }
+      timing () {
+        related_pin : "CLK";
+        timing_type : hold_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+      }
+    }
+
+    bus (BEN) {
+      bus_type : bus_4;
+      direction : input;
+      capacitance : 0.0062;
+      max_transition : 0.4000;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      timing () {
+        related_pin : "CLK";
+        timing_type : setup_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+      }
+      timing () {
+        related_pin : "CLK";
+        timing_type : hold_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+      }
+    }
+
+    bus (A) {
+      bus_type : bus_7;
+      direction : input;
+      capacitance : 0.0062;
+      max_transition : 0.4000;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      timing () {
+        related_pin : "CLK";
+        timing_type : setup_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+      }
+      timing () {
+        related_pin : "CLK";
+        timing_type : hold_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+      }
+    }
+
+    bus (D) {
+      bus_type : bus_32;
+      direction : input;
+      capacitance : 0.0062;
+      max_transition : 0.4000;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      timing () {
+        related_pin : "CLK";
+        timing_type : setup_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+      }
+      timing () {
+        related_pin : "CLK";
+        timing_type : hold_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+      }
+    }
+
+    bus (Q) {
+      bus_type : bus_32;
+      direction : output;
+      max_capacitance : 0.1000;
+      max_transition : 0.4000;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      power_down_function : "!VDD + VSS";
+      timing () {
+        related_pin : "CLK";
+        timing_type : rising_edge;
+        timing_sense : non_unate;
+        cell_rise (mem_delay) {
+          values ("0.7808, 0.8043, 0.8983, 1.1646",\
+               "0.7911, 0.8149, 0.9100, 1.1796",\
+               "0.8323, 0.8572, 0.9570, 1.2396",\
+               "0.9146, 0.9419, 1.0508, 1.3596");
+        }
+        rise_transition (mem_delay) {
+          values ("0.0632, 0.0867, 0.1807, 0.4470",\
+               "0.0735, 0.0973, 0.1924, 0.4620",\
+               "0.1147, 0.1396, 0.2394, 0.5220",\
+               "0.1971, 0.2243, 0.3333, 0.6420");
+        }
+        cell_fall (mem_delay) {
+          values ("0.7500, 0.7735, 0.8675, 1.1338",\
+               "0.7603, 0.7841, 0.8792, 1.1488",\
+               "0.8015, 0.8264, 0.9262, 1.2088",\
+               "0.8839, 0.9111, 1.0201, 1.3288");
+        }
+        fall_transition (mem_delay) {
+          values ("0.0592, 0.0827, 0.1767, 0.4430",\
+               "0.0695, 0.0933, 0.1884, 0.4580",\
+               "0.1107, 0.1356, 0.2354, 0.5180",\
+               "0.1931, 0.2203, 0.3293, 0.6380");
+        }
+      }
+    }
+
+    pin (RETN) {
+      direction : input;
+      capacitance : 0.0058;
+      max_transition : 0.4000;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      timing () {
+        related_pin : "RETN";
+        timing_type : min_pulse_width;
+        rise_constraint (scalar) { values ("1.9200"); }
+        fall_constraint (scalar) { values ("1.9200"); }
+      }
+    }
+
+    pin (PDN) {
+      direction : input;
+      capacitance : 0.0058;
+      max_transition : 0.4000;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      timing () {
+        related_pin : "PDN";
+        timing_type : min_pulse_width;
+        rise_constraint (scalar) { values ("3.8400"); }
+        fall_constraint (scalar) { values ("3.8400"); }
+      }
+    }
+
+    /* Leakage is state dependent: the retention state is what the
+       UPF PD_MEM retention strategy trades read/write access for. */
+    leakage_power () {
+      when : "PDN & RETN";
+      value : 1978.16;
+    }
+    leakage_power () {
+      when : "PDN & !RETN";
+      value : 217.6;
+    }
+    leakage_power () {
+      when : "!PDN";
+      value : 3.96;
+    }
+  }
+
+  cell (sram_2rw_512x32) {
+    /* dsp_subsys sample buffer (1 instance) */
+    area : 6626.0;
+    dont_touch : true;
+    dont_use : true;
+    is_macro_cell : true;
+    interface_timing : true;
+    pad_cell : false;
+    cell_leakage_power : 3486.15;
+
+    memory () {
+      type : ram;
+      address_width : 9;
+      word_width : 32;
+    }
+
+    pg_pin (VDD) {
+      voltage_name : VDD;
+      pg_type : primary_power;
+    }
+
+    pg_pin (VSS) {
+      voltage_name : VSS;
+      pg_type : primary_ground;
+    }
+
+    pin (CLKA) {
+      direction : input;
+      clock : true;
+      capacitance : 0.0180;
+      max_transition : 0.4000;
+      min_pulse_width_high : 0.2400;
+      min_pulse_width_low : 0.2400;
+      min_period : 0.9600;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      internal_power () {
+        rise_power (mem_energy) {
+          values ("0.03968, 0.04682, 0.05396, 0.06111");
+        }
+        fall_power (mem_energy) {
+          values ("0.03412, 0.04027, 0.04641, 0.05255");
+        }
+      }
+    }
+
+    pin (CENA) {
+      direction : input;
+      capacitance : 0.0065;
+      max_transition : 0.4000;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      timing () {
+        related_pin : "CLKA";
+        timing_type : setup_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+      }
+      timing () {
+        related_pin : "CLKA";
+        timing_type : hold_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+      }
+    }
+
+    pin (WENA) {
+      direction : input;
+      capacitance : 0.0065;
+      max_transition : 0.4000;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      timing () {
+        related_pin : "CLKA";
+        timing_type : setup_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+      }
+      timing () {
+        related_pin : "CLKA";
+        timing_type : hold_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+      }
+    }
+
+    bus (BENA) {
+      bus_type : bus_4;
+      direction : input;
+      capacitance : 0.0062;
+      max_transition : 0.4000;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      timing () {
+        related_pin : "CLKA";
+        timing_type : setup_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+      }
+      timing () {
+        related_pin : "CLKA";
+        timing_type : hold_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+      }
+    }
+
+    bus (AA) {
+      bus_type : bus_9;
+      direction : input;
+      capacitance : 0.0062;
+      max_transition : 0.4000;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      timing () {
+        related_pin : "CLKA";
+        timing_type : setup_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+      }
+      timing () {
+        related_pin : "CLKA";
+        timing_type : hold_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+      }
+    }
+
+    bus (DA) {
+      bus_type : bus_32;
+      direction : input;
+      capacitance : 0.0062;
+      max_transition : 0.4000;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      timing () {
+        related_pin : "CLKA";
+        timing_type : setup_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+      }
+      timing () {
+        related_pin : "CLKA";
+        timing_type : hold_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+      }
+    }
+
+    bus (QA) {
+      bus_type : bus_32;
+      direction : output;
+      max_capacitance : 0.1000;
+      max_transition : 0.4000;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      power_down_function : "!VDD + VSS";
+      timing () {
+        related_pin : "CLKA";
+        timing_type : rising_edge;
+        timing_sense : non_unate;
+        cell_rise (mem_delay) {
+          values ("1.2350, 1.2585, 1.3524, 1.6187",\
+               "1.2453, 1.2690, 1.3642, 1.6337",\
+               "1.2864, 1.3114, 1.4111, 1.6937",\
+               "1.3688, 1.3960, 1.5050, 1.8137");
+        }
+        rise_transition (mem_delay) {
+          values ("0.0632, 0.0867, 0.1807, 0.4470",\
+               "0.0735, 0.0973, 0.1924, 0.4620",\
+               "0.1147, 0.1396, 0.2394, 0.5220",\
+               "0.1971, 0.2243, 0.3333, 0.6420");
+        }
+        cell_fall (mem_delay) {
+          values ("1.1860, 1.2095, 1.3035, 1.5698",\
+               "1.1963, 1.2201, 1.3152, 1.5848",\
+               "1.2375, 1.2624, 1.3622, 1.6448",\
+               "1.3199, 1.3471, 1.4561, 1.7648");
+        }
+        fall_transition (mem_delay) {
+          values ("0.0592, 0.0827, 0.1767, 0.4430",\
+               "0.0695, 0.0933, 0.1884, 0.4580",\
+               "0.1107, 0.1356, 0.2354, 0.5180",\
+               "0.1931, 0.2203, 0.3293, 0.6380");
+        }
+      }
+    }
+
+    pin (CLKB) {
+      direction : input;
+      clock : true;
+      capacitance : 0.0180;
+      max_transition : 0.4000;
+      min_pulse_width_high : 0.2400;
+      min_pulse_width_low : 0.2400;
+      min_period : 0.9600;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      internal_power () {
+        rise_power (mem_energy) {
+          values ("0.02857, 0.03371, 0.03885, 0.04400");
+        }
+        fall_power (mem_energy) {
+          values ("0.02457, 0.02899, 0.03342, 0.03784");
+        }
+      }
+    }
+
+    pin (CENB) {
+      direction : input;
+      capacitance : 0.0065;
+      max_transition : 0.4000;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      timing () {
+        related_pin : "CLKB";
+        timing_type : setup_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+      }
+      timing () {
+        related_pin : "CLKB";
+        timing_type : hold_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+      }
+    }
+
+    bus (AB) {
+      bus_type : bus_9;
+      direction : input;
+      capacitance : 0.0062;
+      max_transition : 0.4000;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      timing () {
+        related_pin : "CLKB";
+        timing_type : setup_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.1443, 0.1509, 0.1773, 0.2301",\
+                     "0.1527, 0.1593, 0.1857, 0.2385",\
+                     "0.1863, 0.1929, 0.2193, 0.2721",\
+                     "0.2535, 0.2601, 0.2865, 0.3393");
+        }
+      }
+      timing () {
+        related_pin : "CLKB";
+        timing_type : hold_rising;
+        rise_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+        fall_constraint (mem_constraint) {
+          values ("0.0892, 0.0958, 0.1222, 0.1750",\
+                     "0.0976, 0.1042, 0.1306, 0.1834",\
+                     "0.1312, 0.1378, 0.1642, 0.2170",\
+                     "0.1984, 0.2050, 0.2314, 0.2842");
+        }
+      }
+    }
+
+    bus (QB) {
+      bus_type : bus_32;
+      direction : output;
+      max_capacitance : 0.1000;
+      max_transition : 0.4000;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      power_down_function : "!VDD + VSS";
+      timing () {
+        related_pin : "CLKB";
+        timing_type : rising_edge;
+        timing_sense : non_unate;
+        cell_rise (mem_delay) {
+          values ("1.2350, 1.2585, 1.3524, 1.6187",\
+               "1.2453, 1.2690, 1.3642, 1.6337",\
+               "1.2864, 1.3114, 1.4111, 1.6937",\
+               "1.3688, 1.3960, 1.5050, 1.8137");
+        }
+        rise_transition (mem_delay) {
+          values ("0.0632, 0.0867, 0.1807, 0.4470",\
+               "0.0735, 0.0973, 0.1924, 0.4620",\
+               "0.1147, 0.1396, 0.2394, 0.5220",\
+               "0.1971, 0.2243, 0.3333, 0.6420");
+        }
+        cell_fall (mem_delay) {
+          values ("1.1860, 1.2095, 1.3035, 1.5698",\
+               "1.1963, 1.2201, 1.3152, 1.5848",\
+               "1.2375, 1.2624, 1.3622, 1.6448",\
+               "1.3199, 1.3471, 1.4561, 1.7648");
+        }
+        fall_transition (mem_delay) {
+          values ("0.0592, 0.0827, 0.1767, 0.4430",\
+               "0.0695, 0.0933, 0.1884, 0.4580",\
+               "0.1107, 0.1356, 0.2354, 0.5180",\
+               "0.1931, 0.2203, 0.3293, 0.6380");
+        }
+      }
+    }
+
+    pin (RETN) {
+      direction : input;
+      capacitance : 0.0058;
+      max_transition : 0.4000;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      timing () {
+        related_pin : "RETN";
+        timing_type : min_pulse_width;
+        rise_constraint (scalar) { values ("1.9200"); }
+        fall_constraint (scalar) { values ("1.9200"); }
+      }
+    }
+
+    pin (PDN) {
+      direction : input;
+      capacitance : 0.0058;
+      max_transition : 0.4000;
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      timing () {
+        related_pin : "PDN";
+        timing_type : min_pulse_width;
+        rise_constraint (scalar) { values ("3.8400"); }
+        fall_constraint (scalar) { values ("3.8400"); }
+      }
+    }
+
+    /* Leakage is state dependent: the retention state is what the
+       UPF PD_MEM retention strategy trades read/write access for. */
+    leakage_power () {
+      when : "PDN & RETN";
+      value : 3486.15;
+    }
+    leakage_power () {
+      when : "PDN & !RETN";
+      value : 383.48;
+    }
+    leakage_power () {
+      when : "!PDN";
+      value : 6.97;
+    }
+  }
+
+}

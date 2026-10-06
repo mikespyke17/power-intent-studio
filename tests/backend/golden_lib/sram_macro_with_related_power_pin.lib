@@ -1,0 +1,39 @@
+library (my_sram_lib) {
+    technology (cmos);
+    delay_model : table_lookup;
+
+    cell (SRAM_RPP) {
+        area : 1200.0;
+        pg_pin (VDD) {
+            voltage_name : VDD;
+            pg_type : primary_power;
+        }
+        pg_pin (VSS) {
+            voltage_name : VSS;
+            pg_type : primary_ground;
+        }
+        pg_pin (VDD_IO) {
+            voltage_name : VDD_IO;
+            pg_type : primary_power;
+        }
+        pin (CE) {
+            direction : input;
+            related_power_pin : VDD;
+            related_ground_pin : VSS;
+        }
+        pin (SPARE_IO) {
+            direction : input;
+            related_power_pin : VDD_IO;
+            related_ground_pin : VSS;
+        }
+        pin (NO_RELATION) {
+            direction : output;
+        }
+        bus (dbus) {
+            direction : output;
+            related_power_pin : VDD;
+            pin (dbus[1]) { }
+            pin (dbus[0]) { }
+        }
+    }
+}

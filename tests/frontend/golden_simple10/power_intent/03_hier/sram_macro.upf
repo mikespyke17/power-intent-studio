@@ -1,0 +1,7 @@
+# FAKE_SRAM_256X32 -- vendor-supplied macro power intent.
+# Describes the INSIDE of the black box; must not be flattened into the
+# parent design's own diagram.
+create_supply_net VDD_ARRAY
+create_supply_net VDD_PERI
+create_supply_set SS_ARRAY -function {power VDD_ARRAY} -function {ground VSS_IO}
+create_power_domain PD_ARRAY -elements {.} -supply {primary SS_ARRAY}

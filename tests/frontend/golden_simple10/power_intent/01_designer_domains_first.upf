@@ -1,0 +1,56 @@
+# =============================================================================
+# sram subsystem power intent
+# rev 0.4 -- pd team
+#
+# Two domains: the SRAM macro and its control logic stay always-on, the
+# post-read inverter block (u_sub) is switchable.
+# =============================================================================
+
+set_upf_version 3.0
+
+# -- domains up front, before any supply exists ------------------------------
+#    (deliberate authoring order: the partition is decided first, the rails
+#     get attached to it afterwards)
+
+create_power_domain PD_TOP \
+    -elements {.} \
+    -exclude_elements {u_sub}
+
+create_power_domain PD_INV -elements {u_sub}
+
+# -- rails -------------------------------------------------------------------
+
+create_supply_port VDD -direction in
+create_supply_port VSS -direction in
+
+create_supply_net VDD
+create_supply_net VSS
+create_supply_net VDD_INV
+
+connect_supply_net VDD -ports {VDD}
+connect_supply_net VSS -ports {VSS}
+
+# -function, not -supply: the spelling the 1801 LRM actually gives
+create_supply_set ss_aon \
+    -function {power VDD} \
+    -function {ground VSS}
+
+create_supply_set ss_inv \
+    -function {power VDD_INV} \
+    -function {ground VSS}
+
+# -- attach rails to domains the OLD way, via set_domain_supply_net ----------
+#    (rather than create_power_domain -supply, which is the newer form)
+
+set_domain_supply_net PD_TOP \
+    -primary_power_net  VDD \
+    -primary_ground_net VSS
+
+set_domain_supply_net PD_INV \
+    -primary_power_net  VDD_INV \
+    -primary_ground_net VSS
+
+# -- states ------------------------------------------------------------------
+
+add_power_state VDD     -state {ACTIVE 0.99} -state {DOWN off}
+add_power_state VDD_INV -state {ACTIVE 0.99} -state {DOWN off}

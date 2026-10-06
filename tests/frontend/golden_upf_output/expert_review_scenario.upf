@@ -1,0 +1,86 @@
+################################################################################
+#
+#  Power Intent Studio
+#  Unified Power Format (UPF/CPF) Generator
+#
+#  Copyright (c) 2026 Power Intent Studio. All rights reserved.
+#
+#  This file was automatically generated. Manual edits may be
+#  overwritten on the next generation pass.
+#
+#  Design         : sram
+#  Format         : UPF 3.1
+#  Generated      : 2026-10-04 11:16:24
+#  Generator      : Power Intent Studio v1.0
+#
+################################################################################
+
+upf_version 3.1
+set_scope .
+
+################################################################################
+# Supply Ports
+################################################################################
+create_supply_port VDD -direction in
+create_supply_port VSS -direction in
+
+################################################################################
+# Supply Nets
+################################################################################
+create_supply_net VDD
+create_supply_net VSS
+create_supply_net VDD_SUB
+
+################################################################################
+# Connect external ports to internal nets
+################################################################################
+connect_supply_net VDD -ports {VDD}
+connect_supply_net VSS -ports {VSS}
+
+################################################################################
+# Supply Sets
+################################################################################
+create_supply_set SS_VDD \
+    -function {power VDD} \
+    -function {ground VSS}
+
+create_supply_set SS_VDD_SUB \
+    -function {power VDD_SUB} \
+    -function {ground VSS}
+
+################################################################################
+# Power Domains
+################################################################################
+create_power_domain PD_TOP \
+    -elements {.} \
+    -exclude_elements { \
+        u_sub \
+    } \
+    -supply {primary SS_VDD} \
+    -available_supplies { SS_VDD_SUB }
+
+create_power_domain PD_SUB \
+    -elements { \
+        u_sub \
+    } \
+    -supply {primary SS_VDD_SUB}
+
+################################################################################
+# Power Switches
+################################################################################
+create_power_switch PG \
+    -domain PD_SUB \
+    -input_supply_port {VDDH VDD} \
+    -output_supply_port {VDDL VDD_SUB} \
+    -control_port {SLEEP sleep_b} \
+    -on_state {on VDDH {SLEEP}} \
+    -off_state {off {!SLEEP}}
+map_power_switch {PG} \
+    -domain PD_SUB \
+    -lib_cells {cell_type_pg}
+
+################################################################################
+# Macro Connections
+################################################################################
+connect_supply_net VDD  -ports {u_sram/VDD}
+connect_supply_net VSS  -ports {u_sram/VSS}

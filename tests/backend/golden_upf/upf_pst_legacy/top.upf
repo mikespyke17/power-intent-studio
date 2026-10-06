@@ -1,0 +1,7 @@
+upf_version 2.1
+
+create_power_domain PD_TOP -elements {.}
+
+create_pst PST_MAIN -supplies {VDD VDD_IO}
+add_pst_state ON_STATE -pst_name PST_MAIN -state {1.0 1.8}
+add_pst_state OFF_STATE -pst_name PST_MAIN -state {0 0}

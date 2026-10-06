@@ -1,0 +1,2 @@
+create_power_domain PD_SUB -elements {u_inner}
+set_isolation ISO_SUB -domain PD_SUB -source PD_SUB -sink PD_TOP -location fanout

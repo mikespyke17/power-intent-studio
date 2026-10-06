@@ -1,0 +1,4 @@
+upf_version 3.1
+
+create_supply_net VDD
+connect_supply_net VDD -ports {p1 p2}

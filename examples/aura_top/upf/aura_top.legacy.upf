@@ -1,0 +1,460 @@
+################################################################################
+#
+#  Power Intent Studio
+#  Unified Power Format (UPF/CPF) Generator
+#
+#  Copyright (c) 2026 Power Intent Studio. All rights reserved.
+#
+#  This file was automatically generated. Manual edits may be
+#  overwritten on the next generation pass.
+#
+#  Design         : aura_top
+#  Format         : UPF 3.1
+#  Generated      : 2026-10-06 09:15:25
+#  Generator      : Power Intent Studio v1.1
+#
+################################################################################
+
+upf_version 3.1
+set_scope .
+
+################################################################################
+# Supply Ports
+################################################################################
+create_supply_port VDD_AON -direction in
+create_supply_port VDD_HI -direction in
+create_supply_port VDD_MEM -direction in
+create_supply_port VDD_RET -direction in
+create_supply_port VDD_TOP -direction in
+create_supply_port VSS -direction in
+
+################################################################################
+# Supply Nets
+################################################################################
+create_supply_net VDD_AON
+create_supply_net VDD_HI
+create_supply_net VDD_MEM
+create_supply_net VDD_RET
+create_supply_net VDD_TOP
+create_supply_net VSS
+create_supply_net VDD_CPU
+create_supply_net VDD_DSP
+create_supply_net VDD_PER
+
+################################################################################
+# Connect external ports to internal nets
+################################################################################
+connect_supply_net VDD_AON -ports {VDD_AON}
+connect_supply_net VDD_HI  -ports {VDD_HI}
+connect_supply_net VDD_MEM -ports {VDD_MEM}
+connect_supply_net VDD_RET -ports {VDD_RET}
+connect_supply_net VDD_TOP -ports {VDD_TOP}
+connect_supply_net VSS     -ports {VSS}
+
+################################################################################
+# Supply Sets
+################################################################################
+create_supply_set SS_TOP \
+    -function {power VDD_TOP} \
+    -function {ground VSS}
+
+create_supply_set SS_AON \
+    -function {power VDD_AON} \
+    -function {ground VSS}
+
+create_supply_set SS_CPU \
+    -function {power VDD_CPU} \
+    -function {ground VSS}
+
+create_supply_set SS_CPU_AON \
+    -function {power VDD_AON} \
+    -function {ground VSS}
+
+create_supply_set SS_CPU_RET \
+    -function {power VDD_RET} \
+    -function {ground VSS}
+
+create_supply_set SS_DSP \
+    -function {power VDD_DSP} \
+    -function {ground VSS}
+
+create_supply_set SS_DSP_AON \
+    -function {power VDD_AON} \
+    -function {ground VSS}
+
+create_supply_set SS_MEM \
+    -function {power VDD_MEM} \
+    -function {ground VSS}
+
+create_supply_set SS_MEM_RET \
+    -function {power VDD_RET} \
+    -function {ground VSS}
+
+create_supply_set SS_PER \
+    -function {power VDD_PER} \
+    -function {ground VSS}
+
+create_supply_set SS_PER_AON \
+    -function {power VDD_AON} \
+    -function {ground VSS}
+
+################################################################################
+# Power Domains
+################################################################################
+create_power_domain PD_TOP \
+    -elements {.} \
+    -exclude_elements { \
+        u_aon \
+        u_clk_rst \
+        u_cpu \
+        u_dsp \
+        u_mem \
+        u_periph \
+    } \
+    -supply {primary SS_TOP}
+
+create_power_domain PD_AON \
+    -elements { \
+        u_aon \
+        u_clk_rst \
+    } \
+    -supply {primary SS_AON}
+
+create_power_domain PD_MEM \
+    -elements { \
+        u_mem \
+    } \
+    -supply {primary SS_MEM} \
+    -available_supplies { SS_MEM_RET }
+
+create_power_domain PD_PERIPH \
+    -elements { \
+        u_periph \
+    } \
+    -supply {primary SS_PER} \
+    -available_supplies { SS_PER_AON }
+
+create_power_domain PD_DSP \
+    -elements { \
+        u_dsp \
+    } \
+    -supply {primary SS_DSP} \
+    -available_supplies { SS_DSP_AON }
+
+create_power_domain PD_CPU \
+    -elements { \
+        u_cpu \
+    } \
+    -supply {primary SS_CPU} \
+    -available_supplies { SS_CPU_AON SS_CPU_RET }
+
+################################################################################
+# Retention Strategies
+################################################################################
+set_retention RET_CPU \
+    -domain PD_CPU \
+    -retention_supply_set SS_CPU_RET \
+    -elements { \
+        u_cpu/u_ack/ack_q \
+        u_cpu/u_ack/cnt_q[*] \
+        u_cpu/u_core/alu_result_q[*] \
+        u_cpu/u_core/branch_taken_q \
+        u_cpu/u_core/illegal_q \
+        u_cpu/u_core/instr_q[*] \
+        u_cpu/u_core/mul_result_q[*] \
+        u_cpu/u_core/st_q \
+        u_cpu/u_core/u_ex/u_mul/busy_q \
+        u_cpu/u_core/u_ex/u_mul/cnt_q[*] \
+        u_cpu/u_core/u_ex/u_mul/prod_q[*] \
+        u_cpu/u_core/u_if/pc_q[*] \
+        u_cpu/u_core/u_lsu/done_q \
+        u_cpu/u_core/u_lsu/err_q \
+        u_cpu/u_core/u_lsu/f3_q[*] \
+        u_cpu/u_core/u_lsu/off_q[*] \
+        u_cpu/u_core/u_lsu/rdata_q[*] \
+        u_cpu/u_core/u_lsu/st_q \
+        u_cpu/u_icache/addr_q[*] \
+        u_cpu/u_icache/fill_data_q[*] \
+        u_cpu/u_icache/fill_err_q \
+        u_cpu/u_icache/st_q \
+        u_cpu/u_icache/u_data_array/rd_pending \
+        u_cpu/u_icache/u_tag_array/rd_pending \
+        u_cpu/u_mux/last_q \
+        u_cpu/u_mux/sel_q \
+        u_cpu/u_mux/st_q \
+    }
+
+set_retention_control RET_CPU \
+    -domain PD_CPU \
+    -save_signal {ret_save_w[2] high} \
+    -restore_signal {ret_restore_w[2] high}
+
+set_retention RET_MEM \
+    -domain PD_MEM \
+    -retention_supply_set SS_MEM_RET \
+    -elements { \
+        u_mem/g_bank[0].u_bank/u_wrap/rd_pending \
+        u_mem/g_bank[1].u_bank/u_wrap/rd_pending \
+        u_mem/g_bank[2].u_bank/u_wrap/rd_pending \
+        u_mem/g_bank[3].u_bank/u_wrap/rd_pending \
+        u_mem/ret_q \
+        u_mem/u_ctrl/addr_q[*] \
+        u_mem/u_ctrl/rdata_q[*] \
+        u_mem/u_ctrl/sel_q[*] \
+        u_mem/u_ctrl/st_q \
+        u_mem/u_ctrl/strb_q[*] \
+        u_mem/u_ctrl/wdata_q[*] \
+    }
+
+set_retention_control RET_MEM \
+    -domain PD_MEM \
+    -save_signal {ret_save_w[4] high} \
+    -restore_signal {ret_restore_w[4] high}
+
+################################################################################
+# Power Switches
+################################################################################
+create_power_switch PSW_CPU \
+    -domain PD_CPU \
+    -input_supply_port {vin VDD_TOP} \
+    -output_supply_port {vout VDD_CPU} \
+    -control_port {sleep_n pwr_en_w[2]} \
+    -ack_port {ack pwr_ack_w[2]} \
+    -on_state {on vin {sleep_n}} \
+    -off_state {off {!sleep_n}}
+
+create_power_switch PSW_DSP \
+    -domain PD_DSP \
+    -input_supply_port {vin VDD_HI} \
+    -output_supply_port {vout VDD_DSP} \
+    -control_port {sleep_n pwr_en_w[3]} \
+    -ack_port {ack pwr_ack_w[3]} \
+    -on_state {on vin {sleep_n}} \
+    -off_state {off {!sleep_n}}
+
+create_power_switch PSW_PER \
+    -domain PD_PERIPH \
+    -input_supply_port {vin VDD_TOP} \
+    -output_supply_port {vout VDD_PER} \
+    -control_port {sleep_n pwr_en_w[5]} \
+    -ack_port {ack pwr_ack_w[5]} \
+    -on_state {on vin {sleep_n}} \
+    -off_state {off {!sleep_n}}
+
+################################################################################
+# Isolation Rules
+################################################################################
+set_isolation ISO_CPU_LOW -domain PD_CPU \
+  -isolation_supply_set SS_CPU_AON \
+  -clamp_value 0 \
+  -isolation_signal {iso_en_w[2]} \
+  -isolation_sense high \
+  -applies_to outputs \
+  -location self
+
+set_isolation ISO_DSP -domain PD_DSP \
+  -isolation_supply_set SS_DSP_AON \
+  -clamp_value 0 \
+  -isolation_signal {iso_en_w[3]} \
+  -isolation_sense high \
+  -applies_to outputs \
+  -location self
+
+set_isolation ISO_MEM -domain PD_MEM \
+  -isolation_supply_set SS_AON \
+  -clamp_value 0 \
+  -isolation_signal {iso_en_w[4]} \
+  -isolation_sense high \
+  -elements { \
+        u_mem/bus.arready \
+        u_mem/bus.awready \
+        u_mem/bus.bresp \
+        u_mem/bus.bvalid \
+        u_mem/bus.rdata[*] \
+        u_mem/bus.rresp \
+        u_mem/bus.rvalid \
+        u_mem/bus.wready \
+    } \
+  -location parent
+
+set_isolation ISO_PER -domain PD_PERIPH \
+  -isolation_supply_set SS_PER_AON \
+  -clamp_value 0 \
+  -isolation_signal {iso_en_w[5]} \
+  -isolation_sense high \
+  -applies_to outputs \
+  -location self
+
+################################################################################
+# Level Shifter Rules
+################################################################################
+set_level_shifter LS_AON_TO_TOP -domain PD_AON \
+  -applies_to outputs \
+  -location parent \
+  -rule both \
+  -threshold 0.08 \
+  -name_prefix ls_aon_out_
+
+set_level_shifter LS_DSP_IN -domain PD_DSP \
+  -applies_to inputs \
+  -location self \
+  -rule low_to_high \
+  -threshold 0.08 \
+  -name_prefix ls_dsp_in_
+
+set_level_shifter LS_DSP_OUT -domain PD_DSP \
+  -applies_to outputs \
+  -location parent \
+  -rule high_to_low \
+  -threshold 0.08 \
+  -name_prefix ls_dsp_out_
+
+set_level_shifter LS_MEM -domain PD_MEM \
+  -applies_to both \
+  -location self \
+  -rule both \
+  -threshold 0.06 \
+  -name_prefix ls_mem_
+
+set_level_shifter LS_PMU_CTRL -domain PD_AON \
+  -location parent \
+  -elements { \
+        u_aon/ch[0].clk_en \
+        u_aon/ch[0].iso_en \
+        u_aon/ch[0].pclk \
+        u_aon/ch[0].prst_n \
+        u_aon/ch[0].pwr_ack \
+        u_aon/ch[0].pwr_en \
+        u_aon/ch[0].ret_restore \
+        u_aon/ch[0].ret_save \
+        u_aon/ch[0].rst_n \
+        u_aon/ch[1].clk_en \
+        u_aon/ch[1].iso_en \
+        u_aon/ch[1].pclk \
+        u_aon/ch[1].prst_n \
+        u_aon/ch[1].pwr_ack \
+        u_aon/ch[1].pwr_en \
+        u_aon/ch[1].ret_restore \
+        u_aon/ch[1].ret_save \
+        u_aon/ch[1].rst_n \
+        u_aon/ch[2].clk_en \
+        u_aon/ch[2].iso_en \
+        u_aon/ch[2].pclk \
+        u_aon/ch[2].prst_n \
+        u_aon/ch[2].pwr_ack \
+        u_aon/ch[2].pwr_en \
+        u_aon/ch[2].ret_restore \
+        u_aon/ch[2].ret_save \
+        u_aon/ch[2].rst_n \
+        u_aon/ch[3].clk_en \
+        u_aon/ch[3].iso_en \
+        u_aon/ch[3].pclk \
+        u_aon/ch[3].prst_n \
+        u_aon/ch[3].pwr_ack \
+        u_aon/ch[3].pwr_en \
+        u_aon/ch[3].ret_restore \
+        u_aon/ch[3].ret_save \
+        u_aon/ch[3].rst_n \
+        u_aon/ch[4].clk_en \
+        u_aon/ch[4].iso_en \
+        u_aon/ch[4].pclk \
+        u_aon/ch[4].prst_n \
+        u_aon/ch[4].pwr_ack \
+        u_aon/ch[4].pwr_en \
+        u_aon/ch[4].ret_restore \
+        u_aon/ch[4].ret_save \
+        u_aon/ch[4].rst_n \
+        u_aon/ch[5].clk_en \
+        u_aon/ch[5].iso_en \
+        u_aon/ch[5].pclk \
+        u_aon/ch[5].prst_n \
+        u_aon/ch[5].pwr_ack \
+        u_aon/ch[5].pwr_en \
+        u_aon/ch[5].ret_restore \
+        u_aon/ch[5].ret_save \
+        u_aon/ch[5].rst_n \
+    } \
+  -rule both \
+  -name_prefix ls_pmu_
+
+set_level_shifter LS_TOP_TO_AON -domain PD_AON \
+  -applies_to inputs \
+  -location self \
+  -rule both \
+  -threshold 0.08 \
+  -name_prefix ls_aon_in_
+
+################################################################################
+# Port State
+################################################################################
+add_port_state VDD_AON \
+    -state {HV 0.8} \
+    -state {LV 0.6}
+
+add_port_state VDD_HI \
+    -state {BOOST 0.9} \
+    -state {NOM 0.72} \
+    -state {OFF off}
+
+add_port_state VDD_MEM \
+    -state {ON 0.8} \
+    -state {RET 0.6} \
+    -state {OFF off}
+
+add_port_state VDD_RET \
+    -state {HV 0.8} \
+    -state {LV 0.6} \
+    -state {OFF off}
+
+add_port_state VDD_TOP \
+    -state {HV 0.8} \
+    -state {LV 0.72}
+
+add_supply_state VDD_PER \
+    -state {HV 0.8} \
+    -state {LV 0.72} \
+    -state {SWITCH_OFF off}
+
+add_supply_state VDD_DSP \
+    -state {BOOST 0.9} \
+    -state {NOM 0.72} \
+    -state {OFF off}
+
+add_supply_state VDD_CPU \
+    -state {HV 0.8} \
+    -state {LV 0.72} \
+    -state {SWITCH_OFF off}
+
+add_port_state VSS \
+    -state {ON 0.0}
+
+################################################################################
+# Power State Table
+################################################################################
+create_pst PST -supplies {VDD_AON VDD_HI VDD_MEM VDD_RET VDD_TOP VDD_PER VDD_DSP VDD_CPU VSS}
+
+add_pst_state PST_TURBO      -pst PST -state {HV  BOOST  ON   HV   HV  HV          BOOST  HV          ON}
+add_pst_state PST_NOM        -pst PST -state {HV  NOM    ON   HV   LV  LV          NOM    LV          ON}
+add_pst_state PST_CPU_ONLY   -pst PST -state {HV  NOM    ON   HV   HV  HV          OFF    HV          ON}
+add_pst_state PST_DSP_BOOST  -pst PST -state {HV  BOOST  ON   HV   LV  LV          BOOST  LV          ON}
+add_pst_state PST_SLEEP_RET  -pst PST -state {HV  NOM    RET  HV   LV  SWITCH_OFF  OFF    SWITCH_OFF  ON}
+add_pst_state PST_DEEP_SLEEP -pst PST -state {LV  NOM    OFF  LV   LV  SWITCH_OFF  OFF    SWITCH_OFF  ON}
+add_pst_state PST_SHUTDOWN   -pst PST -state {LV  NOM    OFF  OFF  LV  SWITCH_OFF  OFF    SWITCH_OFF  ON}
+
+################################################################################
+# Macro Connections
+################################################################################
+connect_supply_net VDD_CPU  -ports {u_cpu/u_icache/u_data_array/g_128x32.u_macro/VDD}
+connect_supply_net VDD_CPU  -ports {u_cpu/u_icache/u_tag_array/g_128x32.u_macro/VDD}
+connect_supply_net VDD_DSP  -ports {u_dsp/u_mem/u_macro_wrap/g_512x32.u_macro/VDD}
+connect_supply_net VDD_MEM  -ports {u_mem/g_bank[0].u_bank/u_wrap/g_1024x32.u_macro/VDD}
+connect_supply_net VDD_MEM  -ports {u_mem/g_bank[2].u_bank/u_wrap/g_1024x32.u_macro/VDD}
+connect_supply_net VDD_MEM  -ports {u_mem/g_bank[1].u_bank/u_wrap/g_1024x32.u_macro/VDD}
+connect_supply_net VDD_MEM  -ports {u_mem/g_bank[3].u_bank/u_wrap/g_1024x32.u_macro/VDD}
+connect_supply_net VSS      -ports {u_cpu/u_icache/u_data_array/g_128x32.u_macro/VSS}
+connect_supply_net VSS      -ports {u_cpu/u_icache/u_tag_array/g_128x32.u_macro/VSS}
+connect_supply_net VSS      -ports {u_mem/g_bank[3].u_bank/u_wrap/g_1024x32.u_macro/VSS}
+connect_supply_net VSS      -ports {u_mem/g_bank[1].u_bank/u_wrap/g_1024x32.u_macro/VSS}
+connect_supply_net VSS      -ports {u_mem/g_bank[0].u_bank/u_wrap/g_1024x32.u_macro/VSS}
+connect_supply_net VSS      -ports {u_mem/g_bank[2].u_bank/u_wrap/g_1024x32.u_macro/VSS}
+connect_supply_net VSS      -ports {u_dsp/u_mem/u_macro_wrap/g_512x32.u_macro/VSS}

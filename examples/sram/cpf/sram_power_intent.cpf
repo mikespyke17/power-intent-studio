@@ -1,0 +1,122 @@
+################################################################################
+#
+#  Power Intent Studio
+#  Unified Power Format (UPF/CPF) Generator
+#
+#  Copyright (c) 2026 Power Intent Studio. All rights reserved.
+#
+#  This file was automatically generated. Manual edits may be
+#  overwritten on the next generation pass.
+#
+#  Design         : sram
+#  Format         : CPF 2.0
+#  Generated      : 2026-09-26 15:52:41
+#  Generator      : Power Intent Studio v1.0
+#
+# Supply Sets have no direct CPF equivalent -- folded into each
+# domain's own primary_power_net/primary_ground_net below instead.
+################################################################################
+
+set_cpf_version 2.0
+set_hierarchy_separator /
+set_design sram
+
+################################################################################
+# Power Supplies (power)
+################################################################################
+create_power_nets -nets {VDD}
+
+################################################################################
+# Internal Supplies (power)
+################################################################################
+create_power_nets -nets {VDD_SUB} -internal
+
+################################################################################
+# Power Supplies (ground)
+################################################################################
+create_ground_nets -nets {VSS}
+
+################################################################################
+# Virtual Supplies
+################################################################################
+create_power_nets -nets {VDD_INT}
+
+################################################################################
+# Power Domains
+################################################################################
+create_power_domain -name PD_SUB -instances {
+    u_sub
+} -shutoff_condition {!pwr_switch_en}
+update_power_domain -name PD_SUB -primary_power_net VDD_SUB -primary_ground_net VSS
+
+create_power_domain -name PD_TOP -default -exclude_instances {
+    u_sub
+}
+update_power_domain -name PD_TOP -primary_power_net VDD -primary_ground_net VSS
+
+################################################################################
+# Retention Strategies
+################################################################################
+create_state_retention_rule -name RET_SUB \
+    -domain PD_SUB \
+    -instances { \
+        u_sub/o_q \
+    }
+#   RET_SUB: save='save_ctrl' restore='restore_ctrl' primary_supply=SS_VDD_SUB retention_supply=SS_VDD
+
+################################################################################
+# Power Switches
+################################################################################
+create_power_switch_rule -name PG_SWITCH -domain PD_SUB -external_power_net VDD
+update_power_switch_rule -name PG_SWITCH -cells {TYPE_CELL_LVT_PG}
+update_power_switch_rule -name PG_SWITCH -enable_condition_1 {pwr_switch_en}
+update_power_switch_rule -name PG_SWITCH -acknowledge_receiver_1 {pwr_switch_ack}
+#   PG_SWITCH: output_supply=VDD_SUB cell_pin_in='VIN' cell_pin_out='VOUT' control_port='CTRL' ack_port='ACK' on_state='pwr_switch_en' off_state='!pwr_switch_en'
+
+################################################################################
+# Isolation Rules
+################################################################################
+create_isolation_rule -name ISO_RULE \
+    -from PD_SUB \
+    -isolation_condition {iso_control} \
+    -isolation_output low \
+    -pins { \
+        o_q \
+    } \
+    -secondary_domain PD_TOP
+#   ISO_RULE: -location self needs CPF 2.1 (added there; this file declares 2.0) -- omitted
+
+################################################################################
+# Nominal Conditions
+################################################################################
+create_nominal_condition -name COND_1 -voltage 1.2
+
+create_nominal_condition -name COND_2 -voltage 0.9
+
+create_nominal_condition -name COND_3 -voltage 0.0
+
+################################################################################
+# Power Modes
+################################################################################
+create_power_mode -name ON -domain_conditions {PD_SUB@COND_1 PD_TOP@COND_1} -default
+
+create_power_mode -name IDLE -domain_conditions {PD_SUB@COND_2 PD_TOP@COND_2}
+
+create_power_mode -name RETENTION -domain_conditions {PD_SUB@COND_3 PD_TOP@COND_2}
+
+create_power_mode -name OFF -domain_conditions {PD_SUB@COND_3 PD_TOP@COND_3}
+
+#   A CPF nominal condition is a single VOLTAGE, and a power mode maps POWER
+#   DOMAINS to conditions -- so each domain's condition above is its PRIMARY
+#   supply set's POWER rail. CPF has no supply-set construct, so the
+#   ground/nwell/pwell rails and the supply-set grouping itself are not
+#   expressible here.
+
+################################################################################
+# Macro Connections
+################################################################################
+create_global_connection -net VDD     -pins {u_sram/VDD}
+create_global_connection -net VSS     -pins {u_sram/VSS}
+create_global_connection -net VDD_INT -pins {u_sram/VDD_INT}
+
+end_design

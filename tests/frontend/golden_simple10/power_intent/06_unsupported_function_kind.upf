@@ -1,0 +1,7 @@
+# Companion to 06_wells_and_refinement.upf: confirms that widening
+# -function to accept nwell/pwell did NOT stop the elaborator rejecting a
+# kind it genuinely has nowhere to put. Expected to FAIL elaboration with
+# a message naming the kind and what is supported.
+set_upf_version 3.1
+create_supply_net VDDB
+create_supply_set SS_BAD -function {bulk VDDB}

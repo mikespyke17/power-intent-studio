@@ -1,0 +1,2 @@
+create_power_domain PD1 -elements {.}
+set_isolation ISO1 -domain PD1

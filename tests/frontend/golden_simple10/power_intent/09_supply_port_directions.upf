@@ -1,0 +1,23 @@
+# All four Direction states on one design: the three real UPF values plus
+# a port that declares none at all. The no-flag case is the point -- an
+# imported port with no -direction must come back as <empty>, NOT as the
+# "in" a newly-created port defaults to in this app.
+set_upf_version 3.1
+
+create_supply_port VDD_I -direction in
+create_supply_port VDD_O -direction out
+create_supply_port VDD_B -direction inout
+create_supply_port VSS_N
+
+create_supply_net VDD_I
+create_supply_net VDD_O
+create_supply_net VDD_B
+create_supply_net VSS_N
+
+connect_supply_net VDD_I -ports {VDD_I}
+connect_supply_net VDD_O -ports {VDD_O}
+connect_supply_net VDD_B -ports {VDD_B}
+connect_supply_net VSS_N -ports {VSS_N}
+
+create_supply_set SS_D -function {power VDD_I} -function {ground VSS_N}
+create_power_domain PD_D -elements {.} -supply {primary SS_D}

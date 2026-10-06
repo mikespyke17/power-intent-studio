@@ -1,0 +1,2 @@
+set unused_var 1
+proc unused_proc {} { return 1 }

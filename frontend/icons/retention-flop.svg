@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+  <rect x="10" y="1" width="10" height="16" stroke="#242930" stroke-width="1.5" fill="none" opacity="0.55"></rect>
+  <line x1="2" y1="12" x2="7" y2="12" stroke="#242930" stroke-width="1.5"></line>
+  <rect x="7" y="4" width="10" height="16" stroke="#242930" stroke-width="1.5" fill="none"></rect>
+  <line x1="17" y1="12" x2="22" y2="12" stroke="#242930" stroke-width="1.5"></line>
+  <path d="M7 16 L11 18 L7 20 Z" fill="#242930"></path>
+  <text x="12" y="13.1" font-family="Space Mono,monospace" font-size="4.2" font-weight="700" fill="#242930" text-anchor="middle" letter-spacing="0.2">RET</text>
+</svg>

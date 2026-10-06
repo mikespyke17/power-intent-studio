@@ -1,0 +1,64 @@
+library (well_bias_lib) {
+    technology (cmos);
+    delay_model : table_lookup;
+
+    cell (SRAM_WELL_BIAS) {
+        area : 1200.0;
+        pg_pin (VDD) {
+            voltage_name : VDD;
+            pg_type : primary_power;
+        }
+        pg_pin (VSS) {
+            voltage_name : VSS;
+            pg_type : primary_ground;
+        }
+        pg_pin ("VPB") {
+            pg_type : nwell;
+            related_bias_pin : "VDD";
+        }
+        pg_pin ("VNB") {
+            pg_type : pwell;
+            related_bias_pin : "VSS";
+        }
+        pg_pin ("VPW") {
+            pg_type : pwell;
+            voltage_name : "VPW";
+            physical_connection : device_layer;
+        }
+        pin (CE) {
+            direction : input;
+            related_power_pin : VDD;
+            related_ground_pin : VSS;
+        }
+        pg_pin (VDD_NOBIAS) {
+            voltage_name : VDD_NOBIAS;
+            pg_type : primary_power;
+        }
+    }
+
+    cell (SRAM_WELL_BIAS_NWELL_EXPOSED) {
+        area : 1200.0;
+        pg_pin (VDD) {
+            voltage_name : VDD;
+            pg_type : primary_power;
+        }
+        pg_pin (VSS) {
+            voltage_name : VSS;
+            pg_type : primary_ground;
+        }
+        pg_pin ("VNW") {
+            pg_type : nwell;
+            voltage_name : "VNW";
+            physical_connection : device_layer;
+        }
+        pg_pin ("VPW") {
+            pg_type : pwell;
+            related_bias_pin : "VSS";
+        }
+        pin (CE) {
+            direction : input;
+            related_power_pin : VDD;
+            related_ground_pin : VSS;
+        }
+    }
+}

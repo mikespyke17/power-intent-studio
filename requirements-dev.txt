@@ -1,0 +1,17 @@
+# Power Intent Studio -- development and test dependencies.
+#
+#     pip install -r requirements-dev.txt
+#     pytest
+#
+# Includes the runtime dependencies, since the test suite exercises the
+# real application: the backend tests elaborate real RTL and power
+# intent, and the frontend tests build real Qt widgets.
+-r requirements.txt
+
+# Test runner.
+pytest==9.1.1
+
+# Qt test fixtures -- provides the `qtbot` fixture the widget tests are
+# built on. Used through that fixture rather than by a direct import,
+# which is why an import scan alone does not surface it.
+pytest-qt==4.5.0

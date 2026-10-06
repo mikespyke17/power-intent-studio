@@ -1,0 +1,2 @@
+upf_version 2.0
+create_power_domain PD_TOP -elements {.}

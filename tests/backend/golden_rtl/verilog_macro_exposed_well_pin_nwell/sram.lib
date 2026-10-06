@@ -1,0 +1,196 @@
+library(fake_sram_lib) {
+  comment : "Synthetic SRAM Liberty model for VLSI flow testing only.";
+  delay_model : table_lookup;
+  capacitive_load_unit (1,pf);
+  current_unit : "1mA";
+  leakage_power_unit : "1nW";
+  time_unit : "1ns";
+  voltage_unit : "1V";
+
+  nom_process : 1.0;
+  nom_temperature : 25;
+  nom_voltage : 0.80;
+
+  operating_conditions(typical) {
+    process : 1.0;
+    temperature : 25;
+    voltage : 0.80;
+    tree_type : balanced_tree;
+  }
+
+  default_operating_conditions : typical;
+
+  cell(FAKE_SRAM_256X32) {
+    area : 1200.0;
+
+    /* Power-switch / macro-style attributes */
+    switch_cell_type : fine_grain;
+    is_macro_cell : true;
+    dont_use : true;
+    dont_touch : true;
+    interface_timing : true;
+    timing_model_type : "extracted";
+
+    /* ------------------------------------------------------------
+       Main PG pins
+       ------------------------------------------------------------ */
+    pg_pin("VDD") {
+      voltage_name : "VDD";
+      pg_type : primary_power;
+      direction : inout;
+    }
+
+    pg_pin("VSS") {
+      voltage_name : "VSS";
+      pg_type : primary_ground;
+      direction : inout;
+    }
+
+
+  
+  /* EXPOSED NWELL: Completely independent bias rail */
+  pg_pin ("VNW") {
+    pg_type : nwell;
+    voltage_name : "VNW";            /* Points to an isolated N-Well voltage supply */
+    physical_connection : device_layer; /* Tells tools it taps directly to the silicon layer */
+  }
+
+    pg_pin ("VPW") {
+    pg_type : pwell;
+    related_bias_pin : "VSS";
+  }
+  
+    /* ------------------------------------------------------------
+       Internal PG pins
+       ------------------------------------------------------------ */
+    pg_pin("VDD_INT") {
+      voltage_name : "VDD_INT";
+      pg_type : internal_power;
+      direction : internal;
+
+      /* Internal rail is derived from / switched from main VDD */
+      pg_function : "VDD";
+      switch_function : "SLEEP_B";
+    }
+
+    pg_pin("VSS_INT") {
+      voltage_name : "VSS_INT";
+      pg_type : internal_ground;
+      direction : internal;
+
+      /* Internal ground is referenced to main VSS */
+      pg_function : "VSS";
+    }
+
+    /* ------------------------------------------------------------
+       Power-management controls mapped to MAIN PG
+       ------------------------------------------------------------ */
+    pin("SLEEP_B") {
+      direction : input;
+      capacitance : 0.002;
+      related_power_pin : "VDD";
+      related_ground_pin : "VSS";
+    }
+
+    pin("ISO_EN") {
+      direction : input;
+      capacitance : 0.002;
+      related_power_pin : "VDD";
+      related_ground_pin : "VSS";
+    }
+
+    /* ------------------------------------------------------------
+       SRAM interface pins mapped to INTERNAL PG
+       ------------------------------------------------------------ */
+    bus(A) {
+      bus_type : SRAM_ADDR_8;
+      direction : input;
+      related_power_pin : "VDD_INT";
+      related_ground_pin : "VSS_INT";
+    }
+
+    bus(D) {
+      bus_type : SRAM_DATA_32;
+      direction : input;
+      related_power_pin : "VDD_INT";
+      related_ground_pin : "VSS_INT";
+    }
+
+    pin("CLK") {
+      direction : input;
+      clock : true;
+      capacitance : 0.004;
+      related_power_pin : "VDD_INT";
+      related_ground_pin : "VSS_INT";
+    }
+
+    pin("CEN_B") {
+      direction : input;
+      capacitance : 0.002;
+      related_power_pin : "VDD_INT";
+      related_ground_pin : "VSS_INT";
+    }
+
+    pin("WEN_B") {
+      direction : input;
+      capacitance : 0.002;
+      related_power_pin : "VDD_INT";
+      related_ground_pin : "VSS_INT";
+    }
+
+    /* ------------------------------------------------------------
+       Outputs mapped to INTERNAL PG and carrying isolation metadata
+       ------------------------------------------------------------ */
+    bus(Q) {
+      bus_type : SRAM_DATA_32;
+      direction : output;
+
+      related_power_pin : "VDD_INT";
+      related_ground_pin : "VSS_INT";
+
+      is_isolated : true;
+      isolation_enable_condition : "ISO_EN";
+
+      max_capacitance : 0.050;
+      min_capacitance : 0.001;
+    }
+
+    /* ------------------------------------------------------------
+       Example status output mapped to MAIN PG instead of internal PG.
+       This demonstrates I/O existing in both the main-PG domain and
+       the internal-PG domain within the same macro.
+       ------------------------------------------------------------ */
+    pin("POWER_GOOD") {
+      direction : output;
+      function : "SLEEP_B";
+
+      related_power_pin : "VDD";
+      related_ground_pin : "VSS";
+
+      is_isolated : true;
+      isolation_enable_condition : "ISO_EN";
+
+      max_capacitance : 0.010;
+      min_capacitance : 0.001;
+      capacitance : 0.001;
+    }
+  }
+
+  type(SRAM_ADDR_8) {
+    base_type : array;
+    data_type : bit;
+    bit_width : 8;
+    bit_from : 7;
+    bit_to : 0;
+    downto : true;
+  }
+
+  type(SRAM_DATA_32) {
+    base_type : array;
+    data_type : bit;
+    bit_width : 32;
+    bit_from : 31;
+    bit_to : 0;
+    downto : true;
+  }
+}
